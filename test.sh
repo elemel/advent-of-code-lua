@@ -1,24 +1,24 @@
-for dir in 2018/*
+for day in 2018/12/* 2019/12/*
 do
-	if lua $dir/part_1.lua < $dir/input.txt | diff $dir/answer_1.txt -
+	if lua $day/part_1.lua < $day/input.txt | diff $day/answer_1.txt -
 	then
 		tput setaf 2
-		echo $dir/part_1.lua: PASS
+		echo $day/part_1.lua: PASS
 		tput sgr0
 	else
 		tput setaf 1
-		echo $dir/part_1.lua: FAIL
+		echo $day/part_1.lua: FAIL
 		tput sgr0
 	fi
 
-	if lua $dir/part_2.lua < $dir/input.txt | diff $dir/answer_2.txt -
+	if lua $day/part_2.lua < $day/input.txt | diff $day/answer_2.txt -
 	then
 		tput setaf 2
-		echo $dir/part_2.lua: PASS
+		echo $day/part_2.lua: PASS
 		tput sgr0
 	else
 		tput setaf 1
-		echo $dir/part_2.lua: FAIL
+		echo $day/part_2.lua: FAIL
 		tput sgr0
 	fi
 done
