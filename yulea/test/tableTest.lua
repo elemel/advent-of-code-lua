@@ -1,5 +1,5 @@
-local yulea = require("yulea")
 local testUtils = require("yulea.test.testUtils")
+local yulea = require("yulea")
 
 local array = yulea.table.array
 local compare = yulea.table.compare

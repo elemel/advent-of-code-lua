@@ -1,19 +1,20 @@
-local function array(iterator, result)
+local function array(iterator, result, first, last, step)
   result = result or {}
+  first = first or 1
+  last = last or math.huge
+  step = step or 1
 
-  for element in iterator do
-    table.insert(result, element)
+  for i = first, last, step do
+    local element = iterator()
+
+    if element == nil then
+      break
+    end
+
+    result[i] = element
   end
 
   return result
-end
-
-local function elements(t)
-  return coroutine.wrap(function()
-    for _, e in ipairs(t) do
-      coroutine.yield(e)
-    end
-  end)
 end
 
 local function compare(t1, t2, compareElement)
@@ -28,6 +29,24 @@ local function compare(t1, t2, compareElement)
   end
 
   return #t1 < #t2
+end
+
+local function copy(t, result)
+  result = result or {}
+
+  for k, v in pairs(t) do
+    result[k] = v
+  end
+
+  return result
+end
+
+local function elements(t)
+  return coroutine.wrap(function()
+    for _, e in ipairs(t) do
+      coroutine.yield(e)
+    end
+  end)
 end
 
 local function keys(t)
@@ -91,6 +110,7 @@ end
 return {
   array = array,
   compare = compare,
+  copy = copy,
   elements = elements,
   keys = keys,
   mapValues = mapValues,
