@@ -6,7 +6,7 @@ local split = yulea.string.split
 
 local program = array(
   map(
-    split(io.read("*line"), ","),
+    split(io.read(), ","),
     tonumber),
   {}, 0)
 
@@ -17,18 +17,18 @@ local ip = 0
 
 while program[ip] ~= 99 do
   if program[ip] == 1 then
-    local param1 = program[ip + 1]
-    local param2 = program[ip + 2]
-    local param3 = program[ip + 3]
+    local a = program[ip + 1]
+    local b = program[ip + 2]
+    local c = program[ip + 3]
 
-    program[param3] = program[param1] + program[param2]
+    program[c] = program[a] + program[b]
     ip = ip + 4
   elseif program[ip] == 2 then
-    local param1 = program[ip + 1]
-    local param2 = program[ip + 2]
-    local param3 = program[ip + 3]
+    local a = program[ip + 1]
+    local b = program[ip + 2]
+    local c = program[ip + 3]
 
-    program[param3] = program[param1] * program[param2]
+    program[c] = program[a] * program[b]
     ip = ip + 4
   end
 end

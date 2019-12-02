@@ -22,24 +22,29 @@ local function run(program, noun, verb)
     end
 
     if opcode == 1 then
-      local param1 = memory[ip + 1]
-      local param2 = memory[ip + 2]
-      local param3 = memory[ip + 3]
+      local a = memory[ip + 1]
+      local b = memory[ip + 2]
+      local c = memory[ip + 3]
 
-      memory[param3] = memory[param1] + memory[param2]
+      memory[c] = memory[a] + memory[b]
       ip = ip + 4
     elseif opcode == 2 then
-      local param1 = memory[ip + 1]
-      local param2 = memory[ip + 2]
-      local param3 = memory[ip + 3]
+      local a = memory[ip + 1]
+      local b = memory[ip + 2]
+      local c = memory[ip + 3]
 
-      memory[param3] = memory[param1] * memory[param2]
+      memory[c] = memory[a] * memory[b]
       ip = ip + 4
     end
   end
 end
 
-local program = array(map(split(io.read("*line"), ","), tonumber), {}, 0)
+local program = array(
+  map(
+    split(io.read(), ","),
+    tonumber),
+  {},
+  0)
 
 for noun = 0, 99 do
   for verb = 0, 99 do
