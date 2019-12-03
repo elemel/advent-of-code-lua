@@ -28,13 +28,38 @@ local function distinct(iterator)
   end)
 end
 
-local function enumerate(iterator, index)
-  index = index or 1
+local function enumerate(iterator, first, last, step)
+  first = first or 1
+  last = last or math.huge
+  step = step or 1
 
   return coroutine.wrap(function()
-    for element in iterator do
-      coroutine.yield(index, element)
-      index = index + 1
+    for i = first, last, step do
+      local element = iterator()
+
+      if element == nil then
+        break
+      end
+
+      coroutine.yield(i, element)
+    end
+  end)
+end
+
+local function enumerateTuple(iterator, first, last, step)
+  first = first or 1
+  last = last or math.huge
+  step = step or 1
+
+  return coroutine.wrap(function()
+    for i = first, last, step do
+      local elements = {iterator()}
+
+      if #elements == 0 then
+        break
+      end
+
+      coroutine.yield(i, table.unpack(elements))
     end
   end)
 end
@@ -127,6 +152,7 @@ return {
   cycle = cycle,
   distinct = distinct,
   enumerate = enumerate,
+  enumerateTuple = enumerateTuple,
   filter = filter,
   firstDuplicate = firstDuplicate,
   flatMap = flatMap,
