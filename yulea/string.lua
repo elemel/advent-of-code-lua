@@ -38,19 +38,10 @@ local function trim(s)
   return string.match(s, "^%s*(.-)%s*$")
 end
 
-local function words(s)
-  return coroutine.wrap(function()
-    for w in string.gmatch(s, "%S+") do
-      coroutine.yield(w)
-    end
-  end)
-end
-
 return {
   bytes = bytes,
   chars = chars,
   escape = escape,
   split = split,
   trim = trim,
-  words = words,
 }
