@@ -49,6 +49,38 @@ local function elements(t)
   end)
 end
 
+local function findValue(t, v)
+  for k, v2 in pairs(t) do
+    if v2 == v then
+      return k
+    end
+  end
+
+  return nil
+end
+
+local function histogram(iterator, result)
+  result = result or {}
+
+  for element in iterator do
+    result[element] = (result[element] or 0) + 1
+  end
+
+  return result
+end
+
+local function isSorted(t, compare)
+  compare = compare or function(a, b) return a < b end
+
+  for i = 2, #t do
+    if compare(t[i], t[i - 1]) then
+      return false
+    end
+  end
+
+  return true
+end
+
 local function keys(t)
   return coroutine.wrap(function()
     for k in pairs(t) do
@@ -77,16 +109,6 @@ local function memoize(f)
   })
 end
 
-local function multiset(iterator, result)
-  result = result or {}
-
-  for element in iterator do
-    result[element] = (result[element] or 0) + 1
-  end
-
-  return result
-end
-
 local function reverse(t)
   local i = 1
   local j = #t
@@ -112,10 +134,12 @@ return {
   compare = compare,
   copy = copy,
   elements = elements,
+  findValue = findValue,
+  histogram = histogram,
+  isSorted = isSorted,
   keys = keys,
   mapValues = mapValues,
   memoize = memoize,
-  multiset = multiset,
   reverse = reverse,
   values = values,
 }
