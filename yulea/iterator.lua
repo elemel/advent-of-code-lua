@@ -1,3 +1,15 @@
+local Stream = require("yulea.Stream")
+
+local function count(iterator)
+  local result = 0
+
+  for _ in iterator do
+    result = result + 1
+  end
+
+  return result
+end
+
 local function cycle(iterator)
   return coroutine.wrap(function()
     local elements = {}
@@ -111,11 +123,11 @@ local function range(first, last, step)
   last = last or math.huge
   step = step or 1
 
-  return coroutine.wrap(function()
+  return Stream.new(coroutine.wrap(function()
     for i = first, last, step do
       coroutine.yield(i)
     end
-  end)
+  end))
 end
 
 local function reduce(iterator, reducer)
@@ -149,6 +161,7 @@ local function take(iterator, n)
 end
 
 return {
+  count = count,
   cycle = cycle,
   distinct = distinct,
   enumerate = enumerate,
