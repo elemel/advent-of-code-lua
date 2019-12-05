@@ -6,11 +6,5 @@ local elements = yulea.elements
 local map = yulea.map
 local split = yulea.split
 
-local program = array(
-  map(
-    split(io.read(), ","),
-    tonumber),
-  {},
-  0)
-
-intcode.runProgram(0, program, elements({5}), print)
+local program = intcode.compile(io.read())
+intcode.run(program, 0, elements({5}))

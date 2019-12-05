@@ -1,156 +1,126 @@
-local intcode = {}
+local function read(memory, ip, offset)
+  local divisor = 10 * 10 ^ offset
+  local mode = math.floor(memory[ip] / divisor) % 10
+  local param = memory[ip + offset]
+  local value
 
-local function positionMode(param, memory)
-  return memory[param]
+  if mode == 0 then
+    value = memory[param]
+  elseif mode == 1 then
+    value = param
+  else
+    assert(false, "Invalid read mode")
+  end
+
+  return value
 end
 
-local function immediateMode(param, memory)
-  return param
+local function write(memory, ip, offset, value)
+  local param = memory[ip + offset]
+  memory[param] = value
 end
 
-local parameterModes = {
-  [0] = positionMode,
-  [1] = immediateMode,
-}
-
-local function addOperation(ip, memory, inputs, outputs)
-  local opMode = memory[ip]
-
-  local aMode = math.floor(opMode / 100) % 10
-  local bMode = math.floor(opMode / 1000) % 10
-
-  local a = memory[ip + 1]
-  local b = memory[ip + 2]
-  local c = memory[ip + 3]
-
-  local aValue = parameterModes[aMode](a, memory)
-  local bValue = parameterModes[bMode](b, memory)
-
-  memory[c] = aValue + bValue
+local function add(memory, ip, inputs, outputs)
+  local left = read(memory, ip, 1)
+  local right = read(memory, ip, 2)
+  local result = left + right
+  write(memory, ip, 3, result)
   return ip + 4
 end
 
-local function multiplyOperation(ip, memory, inputs, outputs)
-  local opMode = memory[ip]
-
-  local aMode = math.floor(opMode / 100) % 10
-  local bMode = math.floor(opMode / 1000) % 10
-
-  local a = memory[ip + 1]
-  local b = memory[ip + 2]
-  local c = memory[ip + 3]
-
-  local aValue = parameterModes[aMode](a, memory)
-  local bValue = parameterModes[bMode](b, memory)
-
-  memory[c] = aValue * bValue
+local function multiply(memory, ip, inputs, outputs)
+  local left = read(memory, ip, 1)
+  local right = read(memory, ip, 2)
+  local result = left * right
+  write(memory, ip, 3, result)
   return ip + 4
 end
 
-local function inputOperation(ip, memory, inputs, outputs)
-  local a = memory[ip + 1]
-  memory[a] = inputs()
+local function input(memory, ip, inputs, outputs)
+  local result = inputs()
+  write(memory, ip, 1, result)
   return ip + 2
 end
 
-local function outputOperation(ip, memory, inputs, outputs)
-  local opMode = memory[ip]
-  local aMode = math.floor(opMode / 100) % 10
-  local a = memory[ip + 1]
-  local aValue = parameterModes[aMode](a, memory)
-  outputs(aValue)
+local function output(memory, ip, inputs, outputs)
+  local result = read(memory, ip, 1)
+  outputs(result)
   return ip + 2
 end
 
-local function jumpIfTrueOperation(ip, memory, inputs, outputs)
-  local opMode = memory[ip]
-
-  local aMode = math.floor(opMode / 100) % 10
-  local bMode = math.floor(opMode / 1000) % 10
-
-  local a = memory[ip + 1]
-  local b = memory[ip + 2]
-
-  local aValue = parameterModes[aMode](a, memory)
-  local bValue = parameterModes[bMode](b, memory)
-
-  return aValue ~= 0 and bValue or ip + 3
+local function jumpIfTrue(memory, ip, inputs, outputs)
+  local value = read(memory, ip, 1)
+  local address = read(memory, ip, 2)
+  return value ~= 0 and address or ip + 3
 end
 
-local function jumpIfFalseOperation(ip, memory, inputs, outputs)
-  local opMode = memory[ip]
-
-  local aMode = math.floor(opMode / 100) % 10
-  local bMode = math.floor(opMode / 1000) % 10
-
-  local a = memory[ip + 1]
-  local b = memory[ip + 2]
-
-  local aValue = parameterModes[aMode](a, memory)
-  local bValue = parameterModes[bMode](b, memory)
-
-  return aValue == 0 and bValue or ip + 3
+local function jumpIfFalse(memory, ip, inputs, outputs)
+  local value = read(memory, ip, 1)
+  local address = read(memory, ip, 2)
+  return value == 0 and address or ip + 3
 end
 
-local function lessThanOperation(ip, memory, inputs, outputs)
-  local opMode = memory[ip]
-
-  local aMode = math.floor(opMode / 100) % 10
-  local bMode = math.floor(opMode / 1000) % 10
-
-  local a = memory[ip + 1]
-  local b = memory[ip + 2]
-  local c = memory[ip + 3]
-
-  local aValue = parameterModes[aMode](a, memory)
-  local bValue = parameterModes[bMode](b, memory)
-
-  memory[c] = aValue < bValue and 1 or 0
+local function lessThan(memory, ip, inputs, outputs)
+  local left = read(memory, ip, 1)
+  local right = read(memory, ip, 2)
+  local result = left < right and 1 or 0
+  write(memory, ip, 3, result)
   return ip + 4
 end
 
-local function equalsOperation(ip, memory, inputs, outputs)
-  local opMode = memory[ip]
-
-  local aMode = math.floor(opMode / 100) % 10
-  local bMode = math.floor(opMode / 1000) % 10
-
-  local a = memory[ip + 1]
-  local b = memory[ip + 2]
-  local c = memory[ip + 3]
-
-  local aValue = parameterModes[aMode](a, memory)
-  local bValue = parameterModes[bMode](b, memory)
-
-  memory[c] = aValue == bValue and 1 or 0
+local function equals(memory, ip, inputs, outputs)
+  local left = read(memory, ip, 1)
+  local right = read(memory, ip, 2)
+  local result = left == right and 1 or 0
+  write(memory, ip, 3, result)
   return ip + 4
 end
 
-local function haltOperation(ip, memory, inputs, outputs)
+local function halt(memory, ip, inputs, outputs)
   return nil
 end
 
 local operations = {
-  [1] = addOperation,
-  [2] = multiplyOperation,
-  [3] = inputOperation,
-  [4] = outputOperation,
-  [5] = jumpIfTrueOperation,
-  [6] = jumpIfFalseOperation,
-  [7] = lessThanOperation,
-  [8] = equalsOperation,
-  [99] = haltOperation,
+  [1] = add,
+  [2] = multiply,
+  [3] = input,
+  [4] = output,
+  [5] = jumpIfTrue,
+  [6] = jumpIfFalse,
+  [7] = lessThan,
+  [8] = equals,
+  [99] = halt,
 }
 
-local function runProgram(ip, memory, inputs, outputs)
+local function compile(line)
+  local program = {}
+  local address = 0
+
+  for s in string.gmatch(line, "-?%d+") do
+    program[address] = tonumber(s)
+    address = address + 1
+  end
+
+  return program
+end
+
+local function run(memory, ip, inputs, outputs)
+  ip = ip or 0
+
+  inputs = inputs or function()
+    return io.read("*number")
+  end
+
+  outputs = outputs or print
+
   while ip do
-    -- print("trace", ip, memory[ip], memory[ip + 1], memory[ip + 2], memory[ip + 3])
     local opcode = memory[ip] % 100
     local operation = assert(operations[opcode], "Invalid opcode")
-    ip = operation(ip, memory, inputs, outputs)
+    ip = operation(memory, ip, inputs, outputs)
   end
 end
 
 return {
-  runProgram = runProgram,
+  compile = compile,
+  run = run,
 }
