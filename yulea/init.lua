@@ -13,6 +13,7 @@ return {
   string = yuleaString,
   table = yuleaTable,
 
+  array = yuleaTable.array,
   count = yuleaIterator.count,
   digits = yuleaMath.digits,
   elements = yuleaTable.elements,
@@ -20,5 +21,7 @@ return {
   firstDuplicate = yuleaIterator.firstDuplicate,
   histogram = yuleaTable.histogram,
   isSorted = yuleaTable.isSorted,
+  map = yuleaIterator.map,
   range = yuleaIterator.range,
+  split = yuleaString.split,
 }
