@@ -1,73 +1,77 @@
-local function read(memory, ip, param)
+local function readNumber()
+  return io.read("*number")
+end
+
+local function read(program, param)
   local divisor = 10 * 10 ^ param
-  local mode = math.floor(memory[ip] / divisor) % 10
-  local address = memory[ip + param]
-  return mode == 0 and memory[address] or address
+  local mode = math.floor(program[program.ip] / divisor) % 10
+  local address = program[program.ip + param]
+  return mode == 0 and program[address] or address
 end
 
-local function write(memory, ip, param, value)
-  local address = memory[ip + param]
-  memory[address] = value
+local function write(program, param, value)
+  local address = program[program.ip + param]
+  program[address] = value
 end
 
-local function add(memory, ip, inputs, outputs)
-  local left = read(memory, ip, 1)
-  local right = read(memory, ip, 2)
+local function add(program)
+  local left = read(program, 1)
+  local right = read(program, 2)
   local result = left + right
-  write(memory, ip, 3, result)
-  return ip + 4
+  write(program, 3, result)
+  program.ip = program.ip + 4
 end
 
-local function multiply(memory, ip, inputs, outputs)
-  local left = read(memory, ip, 1)
-  local right = read(memory, ip, 2)
+local function multiply(program)
+  local left = read(program, 1)
+  local right = read(program, 2)
   local result = left * right
-  write(memory, ip, 3, result)
-  return ip + 4
+  write(program, 3, result)
+  program.ip = program.ip + 4
 end
 
-local function input(memory, ip, inputs, outputs)
-  local result = inputs()
-  write(memory, ip, 1, result)
-  return ip + 2
+local function input(program)
+  local result = program.inputs()
+  write(program, 1, result)
+  program.ip = program.ip + 2
 end
 
-local function output(memory, ip, inputs, outputs)
-  local result = read(memory, ip, 1)
-  outputs(result)
-  return ip + 2
+local function output(program)
+  local result = read(program, 1)
+  program.outputs(result)
+  program.ip = program.ip + 2
 end
 
-local function jumpIfTrue(memory, ip, inputs, outputs)
-  local value = read(memory, ip, 1)
-  local address = read(memory, ip, 2)
-  return value ~= 0 and address or ip + 3
+local function jumpIfTrue(program)
+  local value = read(program, 1)
+  local address = read(program, 2)
+  program.ip = value ~= 0 and address or program.ip + 3
 end
 
-local function jumpIfFalse(memory, ip, inputs, outputs)
-  local value = read(memory, ip, 1)
-  local address = read(memory, ip, 2)
-  return value == 0 and address or ip + 3
+local function jumpIfFalse(program)
+  local value = read(program, 1)
+  local address = read(program, 2)
+  program.ip = value == 0 and address or program.ip + 3
 end
 
-local function lessThan(memory, ip, inputs, outputs)
-  local left = read(memory, ip, 1)
-  local right = read(memory, ip, 2)
+local function lessThan(program)
+  local left = read(program, 1)
+  local right = read(program, 2)
   local result = left < right and 1 or 0
-  write(memory, ip, 3, result)
-  return ip + 4
+  write(program, 3, result)
+  program.ip = program.ip + 4
 end
 
-local function equals(memory, ip, inputs, outputs)
-  local left = read(memory, ip, 1)
-  local right = read(memory, ip, 2)
+local function equals(program)
+  local left = read(program, 1)
+  local right = read(program, 2)
   local result = left == right and 1 or 0
-  write(memory, ip, 3, result)
-  return ip + 4
+  write(program, 3, result)
+  program.ip = program.ip + 4
 end
 
-local function halt(memory, ip, inputs, outputs)
-  return nil
+local function halt(program)
+  program.ip = nil
 end
 
 local operations = {
@@ -82,7 +86,7 @@ local operations = {
   [99] = halt,
 }
 
-local function compile(line)
+local function load(line)
   local program = {}
   local address = 0
 
@@ -91,26 +95,22 @@ local function compile(line)
     address = address + 1
   end
 
+  program.ip = 0
+  program.inputs = readNumber
+  program.outputs = print
+
   return program
 end
 
-local function run(memory, ip, inputs, outputs)
-  ip = ip or 0
-
-  inputs = inputs or function()
-    return io.read("*number")
-  end
-
-  outputs = outputs or print
-
-  while ip do
-    local opcode = memory[ip] % 100
+local function run(program)
+  while program.ip do
+    local opcode = program[program.ip] % 100
     local operation = assert(operations[opcode], "Invalid opcode")
-    ip = operation(memory, ip, inputs, outputs)
+    operation(program)
   end
 end
 
 return {
-  compile = compile,
+  load = load,
   run = run,
 }
