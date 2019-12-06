@@ -21,7 +21,10 @@ return {
   firstDuplicate = yuleaIterator.firstDuplicate,
   histogram = yuleaTable.histogram,
   isSorted = yuleaTable.isSorted,
+  keys = yuleaTable.keys,
   map = yuleaIterator.map,
+  memoize = yuleaTable.memoize,
   range = yuleaIterator.range,
   split = yuleaString.split,
+  sum = yuleaMath.sum,
 }
