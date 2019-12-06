@@ -1,3 +1,5 @@
+local Stream = require("yulea.Stream")
+
 local function array(iterator, result, first, last, step)
   result = result or {}
   first = first or 1
@@ -82,10 +84,11 @@ local function isSorted(t, compare)
 end
 
 local function keys(t)
-  return coroutine.wrap(function()
-    for k in pairs(t) do
-      coroutine.yield(k)
-    end
+  local k
+
+  return Stream.new(function()
+    k = next(t, k)
+    return k
   end)
 end
 
@@ -101,11 +104,15 @@ end
 
 local function memoize(f)
   return setmetatable({}, {
+    __call = function(t, k)
+      return t[k]
+    end,
+
     __index = function(t, k)
       local v = f(k)
       t[k] = v
       return v
-    end
+    end,
   })
 end
 

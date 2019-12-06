@@ -1,18 +1,9 @@
 local yulea = require("yulea")
 
+local count = yulea.count
 local keys = yulea.keys
 local map = yulea.map
 local sum = yulea.sum
-
-local function depth(parents, object)
-  local parent = parents[object]
-
-  if not parent then
-    return 0
-  end
-
-  return 1 + depth(parents, parent)
-end
 
 local parents = {}
 
@@ -21,6 +12,14 @@ for line in io.lines() do
   parents[child] = parent
 end
 
-print(sum(map(keys(parents), function(child)
-  return depth(parents, child)
-end)))
+local function ancestors(object)
+  return function()
+    object = parents[object]
+    return object
+  end
+end
+
+print(sum(
+  keys(parents):
+  map(ancestors):
+  map(count)))
