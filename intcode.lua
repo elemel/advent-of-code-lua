@@ -1,23 +1,13 @@
-local function read(memory, ip, offset)
-  local divisor = 10 * 10 ^ offset
+local function read(memory, ip, param)
+  local divisor = 10 * 10 ^ param
   local mode = math.floor(memory[ip] / divisor) % 10
-  local param = memory[ip + offset]
-  local value
-
-  if mode == 0 then
-    value = memory[param]
-  elseif mode == 1 then
-    value = param
-  else
-    assert(false, "Invalid read mode")
-  end
-
-  return value
+  local address = memory[ip + param]
+  return mode == 0 and memory[address] or address
 end
 
-local function write(memory, ip, offset, value)
-  local param = memory[ip + offset]
-  memory[param] = value
+local function write(memory, ip, param, value)
+  local address = memory[ip + param]
+  memory[address] = value
 end
 
 local function add(memory, ip, inputs, outputs)
