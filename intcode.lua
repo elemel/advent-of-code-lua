@@ -86,6 +86,19 @@ local operations = {
   [99] = halt,
 }
 
+local function step(program)
+  assert(program.ip, "Invalid instruction pointer")
+  local opcode = program[program.ip] % 100
+  local operation = assert(operations[opcode], "Invalid opcode")
+  operation(program)
+end
+
+local function run(program)
+  while program.ip do
+    step(program)
+  end
+end
+
 local function load(line)
   local program = {}
   local address = 0
@@ -99,18 +112,14 @@ local function load(line)
   program.inputs = readNumber
   program.outputs = print
 
-  return program
-end
+  program.step = step
+  program.run = run
 
-local function run(program)
-  while program.ip do
-    local opcode = program[program.ip] % 100
-    local operation = assert(operations[opcode], "Invalid opcode")
-    operation(program)
-  end
+  return program
 end
 
 return {
   load = load,
   run = run,
+  step = step,
 }
