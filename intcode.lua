@@ -1,9 +1,5 @@
 local deque = require("deque")
 
-local function readNumber()
-  return io.read("*number")
-end
-
 local function read(program, param)
   local divisor = 10 ^ (param + 1)
   local mode = math.floor(program[program.ip] / divisor) % 10
@@ -117,23 +113,6 @@ local function run(program)
   end
 end
 
-local operationNames = {
-  [1] = "add",
-  [2] = "multiply",
-  [3] = "input",
-  [4] = "output",
-  [5] = "jumpIfTrue",
-  [6] = "jumpIfFalse",
-  [7] = "lessThan",
-  [8] = "equals",
-  [99] = "halt",
-}
-
-local function list(program)
-  local opcode = program[program.ip] % 100
-  print(program.ip, operationNames[opcode] or opcode)
-end
-
 local function compile(source)
   local program = {}
   local address = 0
@@ -153,7 +132,6 @@ end
 
 return {
   compile = compile,
-  list = list,
   run = run,
   step = step,
 }
