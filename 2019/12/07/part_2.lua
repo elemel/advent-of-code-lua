@@ -5,9 +5,7 @@ local elements = yulea.elements
 local maxResult = yulea.maxResult
 local permutations = yulea.permutations
 
-local source = io.read()
-
-local function signal(phases)
+local function signal(source, phases)
   local amplifiers = {}
 
   for phase in elements(phases) do
@@ -37,6 +35,10 @@ local function signal(phases)
   return amplifiers[#amplifiers].outputs:pop_left()
 end
 
+local source = io.read()
+
 print(maxResult(
   permutations({5, 6, 7, 8, 9}):
-  map(signal)))
+  map(function(phases)
+    return signal(source, phases)
+  end)))
