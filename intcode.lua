@@ -134,11 +134,11 @@ local function list(program)
   print(program.ip, operationNames[opcode] or opcode)
 end
 
-local function compile(line)
+local function compile(source)
   local program = {}
   local address = 0
 
-  for s in string.gmatch(line, "-?%d+") do
+  for s in string.gmatch(source, "-?%d+") do
     program[address] = tonumber(s)
     address = address + 1
   end
