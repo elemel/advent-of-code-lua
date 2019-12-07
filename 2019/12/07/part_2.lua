@@ -21,16 +21,18 @@ local function signal(source, phases)
 
   amplifiers[1].inputs:push_right(0)
 
-  local allHalted
-
-  repeat
-    allHalted = true
+  while true do
+    local allHalted = true
 
     for amplifier in elements(amplifiers) do
       intcode.run(amplifier)
       allHalted = allHalted and amplifier.ip == nil
     end
-  until allHalted
+
+    if allHalted then
+      break
+    end
+  end
 
   return amplifiers[#amplifiers].outputs:pop_left()
 end
