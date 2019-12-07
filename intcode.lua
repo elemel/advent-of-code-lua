@@ -1,9 +1,11 @@
+local deque = require("deque")
+
 local function readNumber()
   return io.read("*number")
 end
 
 local function read(program, param)
-  local divisor = 10 * 10 ^ param
+  local divisor = 10 ^ (param + 1)
   local mode = math.floor(program[program.ip] / divisor) % 10
   local address = program[program.ip + param]
   return mode == 0 and program[address] or address
@@ -17,6 +19,7 @@ end
 local function add(program)
   local left = read(program, 1)
   local right = read(program, 2)
+
   local result = left + right
   write(program, 3, result)
   program.ip = program.ip + 4
@@ -25,20 +28,21 @@ end
 local function multiply(program)
   local left = read(program, 1)
   local right = read(program, 2)
+
   local result = left * right
   write(program, 3, result)
   program.ip = program.ip + 4
 end
 
 local function input(program)
-  local result = program.inputs()
-  write(program, 1, result)
+  local value = assert(program.inputs:pop_left(), "Empty input")
+  write(program, 1, value)
   program.ip = program.ip + 2
 end
 
 local function output(program)
-  local result = read(program, 1)
-  program.outputs(result)
+  local value = read(program, 1)
+  program.outputs:push_right(value)
   program.ip = program.ip + 2
 end
 
@@ -57,6 +61,7 @@ end
 local function lessThan(program)
   local left = read(program, 1)
   local right = read(program, 2)
+
   local result = left < right and 1 or 0
   write(program, 3, result)
   program.ip = program.ip + 4
@@ -65,6 +70,7 @@ end
 local function equals(program)
   local left = read(program, 1)
   local right = read(program, 2)
+
   local result = left == right and 1 or 0
   write(program, 3, result)
   program.ip = program.ip + 4
@@ -87,15 +93,27 @@ local operations = {
 }
 
 local function step(program)
-  assert(program.ip, "Invalid instruction pointer")
+  if not program.ip then
+    return false
+  end
+
   local opcode = program[program.ip] % 100
+
+  if opcode == 3 and program.inputs:is_empty() then
+    return false
+  end
+
   local operation = assert(operations[opcode], "Invalid opcode")
   operation(program)
+
+  return true
 end
 
 local function run(program)
-  while program.ip do
-    step(program)
+  for result = 0, math.huge do
+    if not step(program) then
+      return result
+    end
   end
 end
 
@@ -112,7 +130,6 @@ local operationNames = {
 }
 
 local function list(program)
-  assert(program.ip, "Invalid instruction pointer")
   local opcode = program[program.ip] % 100
   print(program.ip, operationNames[opcode] or opcode)
 end
@@ -127,12 +144,9 @@ local function compile(line)
   end
 
   program.ip = 0
-  program.inputs = readNumber
-  program.outputs = print
 
-  program.list = list
-  program.step = step
-  program.run = run
+  program.inputs = deque.new()
+  program.outputs = deque.new()
 
   return program
 end

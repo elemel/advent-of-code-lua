@@ -1,4 +1,11 @@
-for day in 2018/12/* 2019/12/*
+if [ $# -eq 0 ]
+then
+  days=2019/12/*
+else
+  days=$*
+fi
+
+for day in $days
 do
   if lua $day/part_1.lua < $day/input.txt | diff $day/answer_1.txt -
   then
