@@ -6,6 +6,6 @@ local elements = yulea.elements
 local map = yulea.map
 local split = yulea.split
 
-local program = intcode.load(io.read())
+local program = intcode.compile(io.read())
 program.inputs = elements({5})
 intcode.run(program)

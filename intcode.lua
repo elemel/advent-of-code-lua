@@ -99,7 +99,25 @@ local function run(program)
   end
 end
 
-local function load(line)
+local operationNames = {
+  [1] = "add",
+  [2] = "multiply",
+  [3] = "input",
+  [4] = "output",
+  [5] = "jumpIfTrue",
+  [6] = "jumpIfFalse",
+  [7] = "lessThan",
+  [8] = "equals",
+  [99] = "halt",
+}
+
+local function list(program)
+  assert(program.ip, "Invalid instruction pointer")
+  local opcode = program[program.ip] % 100
+  print(program.ip, operationNames[opcode] or opcode)
+end
+
+local function compile(line)
   local program = {}
   local address = 0
 
@@ -112,6 +130,7 @@ local function load(line)
   program.inputs = readNumber
   program.outputs = print
 
+  program.list = list
   program.step = step
   program.run = run
 
@@ -119,7 +138,8 @@ local function load(line)
 end
 
 return {
-  load = load,
+  compile = compile,
+  list = list,
   run = run,
   step = step,
 }

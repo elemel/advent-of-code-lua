@@ -15,6 +15,7 @@ return {
 
   array = yuleaTable.array,
   count = yuleaIterator.count,
+  cycle = yuleaIterator.cycle,
   digits = yuleaMath.digits,
   elements = yuleaTable.elements,
   findValue = yuleaTable.findValue,
@@ -23,7 +24,9 @@ return {
   isSorted = yuleaTable.isSorted,
   keys = yuleaTable.keys,
   map = yuleaIterator.map,
+  maxResult = yuleaMath.maxResult,
   memoize = yuleaTable.memoize,
+  permutations = yuleaTable.permutations,
   range = yuleaIterator.range,
   split = yuleaString.split,
   sum = yuleaMath.sum,

@@ -116,6 +116,29 @@ local function memoize(f)
   })
 end
 
+-- Adapted from: https://www.lua.org/pil/9.3.html
+local function permgen(a, n)
+  if n == 0 then
+    coroutine.yield(a)
+  else
+    for i = 1, n do
+
+      -- put i-th element as the last one
+      a[n], a[i] = a[i], a[n]
+
+      -- generate all permutations of the other elements
+      permgen(a, n - 1)
+
+      -- restore i-th element
+      a[n], a[i] = a[i], a[n]
+    end
+  end
+end
+
+local function permutations(t)
+  return Stream.new(coroutine.wrap(function() permgen(t, #t) end))
+end
+
 local function reverse(t)
   local i = 1
   local j = #t
@@ -147,6 +170,7 @@ return {
   keys = keys,
   mapValues = mapValues,
   memoize = memoize,
+  permutations = permutations,
   reverse = reverse,
   values = values,
 }
