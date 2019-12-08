@@ -1,8 +1,8 @@
-local intcode = require("intcode")
+local midwint = require("midwint")
 
-local program = intcode.compile(io.read())
+local program = midwint.Program.new(io.read())
 program.inputs:push(1)
-intcode.run(program)
+program:run()
 
 while not program.outputs:isEmpty() do
   print(program.outputs:pop())

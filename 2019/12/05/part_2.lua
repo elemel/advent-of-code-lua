@@ -1,6 +1,6 @@
-local intcode = require("intcode")
+local midwint = require("midwint")
 
-local program = intcode.compile(io.read())
+local program = midwint.Program.new(io.read())
 program.inputs:push(5)
-intcode.run(program)
+program:run()
 print(program.outputs:pop())

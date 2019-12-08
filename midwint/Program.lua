@@ -1,27 +1,4 @@
-local Queue = {}
-Queue.__index = Queue
-
-function Queue.new()
-  return setmetatable({first = 1, last = 0}, Queue)
-end
-
-function Queue:push(value)
-  assert(value ~= nil, "Nil value")
-  self.last = self.last + 1
-  self[self.last] = value
-end
-
-function Queue:pop()
-  assert(self.first <= self.last, "Empty queue")
-  local result = self[self.first]
-  self[self.first] = nil
-  self.first = self.first + 1
-  return result
-end
-
-function Queue:isEmpty()
-  return self.first > self.last
-end
+local Queue = require("midwint.Queue")
 
 local function read(program, param)
   local divisor = 10 ^ (param + 1)
@@ -111,32 +88,10 @@ local operations = {
   [99] = halt,
 }
 
-local function step(program)
-  if not program.ip then
-    return false
-  end
+local Program = {}
+Program.__index = Program
 
-  local opcode = program[program.ip] % 100
-
-  if opcode == 3 and program.inputs:isEmpty() then
-    return false
-  end
-
-  local operation = assert(operations[opcode], "Invalid opcode")
-  operation(program)
-
-  return true
-end
-
-local function run(program)
-  for result = 0, math.huge do
-    if not step(program) then
-      return result
-    end
-  end
-end
-
-local function compile(source)
+function Program.new(source)
   local program = {}
   local address = 0
 
@@ -150,11 +105,32 @@ local function compile(source)
   program.inputs = Queue.new()
   program.outputs = Queue.new()
 
-  return program
+  return setmetatable(program, Program)
 end
 
-return {
-  compile = compile,
-  run = run,
-  step = step,
-}
+function Program:step()
+  if not self.ip then
+    return false
+  end
+
+  local opcode = self[self.ip] % 100
+
+  if opcode == 3 and self.inputs:isEmpty() then
+    return false
+  end
+
+  local operation = assert(operations[opcode], "Invalid opcode")
+  operation(self)
+
+  return true
+end
+
+function Program:run()
+  for result = 0, math.huge do
+    if not self:step() then
+      return result
+    end
+  end
+end
+
+return Program

@@ -1,9 +1,9 @@
-local intcode = require("intcode")
+local midwint = require("midwint")
 
-local program = intcode.compile(io.read())
+local program = midwint.Program.new(io.read())
 
 program[1] = 12
 program[2] = 2
 
-intcode.run(program)
+program:run()
 print(program[0])

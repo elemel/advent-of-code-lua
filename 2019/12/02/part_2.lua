@@ -1,12 +1,12 @@
-local intcode = require("intcode")
+local midwint = require("midwint")
 
 local function run(source, noun, verb)
-  local program = intcode.compile(source)
+  local program = midwint.Program.new(source)
 
   program[1] = noun
   program[2] = verb
 
-  intcode.run(program)
+  program:run()
   return program[0]
 end
 

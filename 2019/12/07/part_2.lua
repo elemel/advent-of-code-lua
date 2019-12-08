@@ -1,4 +1,4 @@
-local intcode = require("intcode")
+local midwint = require("midwint")
 local yulea = require("yulea")
 
 local elements = yulea.elements
@@ -9,7 +9,7 @@ local function signal(source, phases)
   local amplifiers = {}
 
   for phase in elements(phases) do
-    local amplifier = intcode.compile(source)
+    local amplifier = midwint.Program.new(source)
     amplifier.inputs:push(phase)
     amplifiers[#amplifiers + 1] = amplifier
   end
@@ -25,7 +25,7 @@ local function signal(source, phases)
     local allHalted = true
 
     for amplifier in elements(amplifiers) do
-      intcode.run(amplifier)
+      amplifier:run()
       allHalted = allHalted and amplifier.ip == nil
     end
 
