@@ -152,10 +152,11 @@ local function reverse(t)
 end
 
 local function values(t)
-  return coroutine.wrap(function()
-    for _, v in pairs(t) do
-      coroutine.yield(v)
-    end
+  local k, v
+
+  return Stream.new(function()
+    k, v = next(t, k)
+    return v
   end)
 end
 
