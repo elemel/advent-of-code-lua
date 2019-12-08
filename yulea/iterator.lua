@@ -130,8 +130,8 @@ local function range(first, last, step)
   end))
 end
 
-local function reduce(iterator, reducer)
-  local result = iterator()
+local function reduce(iterator, reducer, init)
+  local result = init or iterator()
 
   if result ~= nil then
     for element in iterator do

@@ -14,6 +14,7 @@ return {
   table = yuleaTable,
 
   array = yuleaTable.array,
+  chars = yuleaString.chars,
   count = yuleaIterator.count,
   cycle = yuleaIterator.cycle,
   digits = yuleaMath.digits,
@@ -28,6 +29,7 @@ return {
   memoize = yuleaTable.memoize,
   permutations = yuleaTable.permutations,
   range = yuleaIterator.range,
+  reduce = yuleaIterator.reduce,
   split = yuleaString.split,
   sum = yuleaMath.sum,
 }
