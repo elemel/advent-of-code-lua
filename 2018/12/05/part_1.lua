@@ -2,7 +2,6 @@ local yulea = require("yulea")
 
 local array = yulea.table.array
 local elements = yulea.table.elements
-local trim = yulea.string.trim
 local split = yulea.string.split
 
 local function reactive(a, b)
@@ -23,6 +22,6 @@ local function react(polymer, result)
   return result
 end
 
-local polymer = array(split(trim(io.read("*a"))))
+local polymer = array(split(io.read()))
 polymer = react(polymer)
 print(#polymer)

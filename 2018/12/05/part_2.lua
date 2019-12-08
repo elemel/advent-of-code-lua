@@ -8,7 +8,6 @@ local len = yulea.functional.len
 local map = yulea.iterator.map
 local minResult = yulea.math.minResult
 local split = yulea.string.split
-local trim = yulea.string.trim
 
 local function reactive(a, b)
   return a ~= b and string.lower(a) == string.lower(b)
@@ -34,7 +33,7 @@ local function removeUnit(polymer, unit)
     function(u) return string.lower(u) ~= unit end))
 end
 
-local polymer = array(split(trim(io.read("*a"))))
+local polymer = array(split(io.read()))
 
 print(minResult(
   map(
