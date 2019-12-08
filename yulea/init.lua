@@ -23,6 +23,7 @@ return {
   firstDuplicate = yuleaIterator.firstDuplicate,
   histogram = yuleaTable.histogram,
   isSorted = yuleaTable.isSorted,
+  join = yuleaString.join,
   keys = yuleaTable.keys,
   map = yuleaIterator.map,
   maxResult = yuleaMath.maxResult,

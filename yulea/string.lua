@@ -18,6 +18,16 @@ local function escape(s)
   return string.gsub(s, "(%W)", "%%%1")
 end
 
+local function join(iterator, separator)
+  local t = {}
+
+  for v in iterator do
+    t[#t + 1] = v
+  end
+
+  return table.concat(t, separator)
+end
+
 local function split(s, separator)
   separator = separator or "%s+"
 
@@ -42,6 +52,7 @@ return {
   bytes = bytes,
   chars = chars,
   escape = escape,
+  join = join,
   split = split,
   trim = trim,
 }

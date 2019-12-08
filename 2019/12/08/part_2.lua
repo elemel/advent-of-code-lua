@@ -3,6 +3,7 @@ local yulea = require("yulea")
 local array = yulea.array
 local chars = yulea.chars
 local elements = yulea.elements
+local join = yulea.join
 local map = yulea.map
 local range = yulea.range
 
@@ -36,9 +37,9 @@ for z = 1, layerCount do
 end
 
 for y = 1, height do
-  print(table.concat(array(
+  print(join(
     range(1, width)
     :map(function(x)
       return findColor(image, x, y) == 1 and "#" or " "
-    end))))
+    end)))
 end
