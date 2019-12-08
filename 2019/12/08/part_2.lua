@@ -1,11 +1,11 @@
 local yulea = require("yulea")
 
 local array = yulea.array
-local chars = yulea.chars
 local elements = yulea.elements
 local join = yulea.join
 local map = yulea.map
 local range = yulea.range
+local split = yulea.split
 
 local function findColor(image, x, y)
   for layer in elements(image) do
@@ -19,7 +19,7 @@ end
 
 local width = 25
 local height = 6
-local pixels = array(map(chars(io.read()), tonumber))
+local pixels = array(map(split(io.read()), tonumber))
 
 local layerCount = math.floor(#pixels / (width * height))
 local image = {}

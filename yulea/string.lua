@@ -6,14 +6,6 @@ local function bytes(s)
   end)
 end
 
-local function chars(s)
-  return coroutine.wrap(function()
-    for i = 1, #s do
-      coroutine.yield(string.sub(s, i, i))
-    end
-  end)
-end
-
 local function escape(s)
   return string.gsub(s, "(%W)", "%%%1")
 end
@@ -29,7 +21,15 @@ local function join(iterator, separator)
 end
 
 local function split(s, separator)
-  separator = separator or "%s+"
+  separator = separator or ""
+
+  if separator == "" then
+    return coroutine.wrap(function()
+      for c in string.gmatch(s, ".") do
+        coroutine.yield(c)
+      end
+    end)
+  end
 
   return coroutine.wrap(function()
     local pattern = "(.-)(" .. separator .. ")"
@@ -50,7 +50,6 @@ end
 
 return {
   bytes = bytes,
-  chars = chars,
   escape = escape,
   join = join,
   split = split,

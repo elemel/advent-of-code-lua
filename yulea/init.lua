@@ -14,7 +14,6 @@ return {
   table = yuleaTable,
 
   array = yuleaTable.array,
-  chars = yuleaString.chars,
   count = yuleaIterator.count,
   cycle = yuleaIterator.cycle,
   digits = yuleaMath.digits,

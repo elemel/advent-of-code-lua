@@ -1,9 +1,9 @@
 local yulea = require("yulea")
 
 local array = yulea.table.array
-local chars = yulea.string.chars
 local elements = yulea.table.elements
 local trim = yulea.string.trim
+local split = yulea.string.split
 
 local function reactive(a, b)
   return a ~= b and string.lower(a) == string.lower(b)
@@ -23,6 +23,6 @@ local function react(polymer, result)
   return result
 end
 
-local polymer = array(chars(trim(io.read("*a"))))
+local polymer = array(split(trim(io.read("*a"))))
 polymer = react(polymer)
 print(#polymer)
