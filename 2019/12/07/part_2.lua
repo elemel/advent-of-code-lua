@@ -10,7 +10,7 @@ local function signal(source, phases)
 
   for phase in elements(phases) do
     local amplifier = intcode.compile(source)
-    amplifier.inputs:push_right(phase)
+    amplifier.inputs:push(phase)
     amplifiers[#amplifiers + 1] = amplifier
   end
 
@@ -19,7 +19,7 @@ local function signal(source, phases)
     amplifier.outputs = amplifiers[j].inputs
   end
 
-  amplifiers[1].inputs:push_right(0)
+  amplifiers[1].inputs:push(0)
 
   while true do
     local allHalted = true
@@ -34,7 +34,7 @@ local function signal(source, phases)
     end
   end
 
-  return amplifiers[#amplifiers].outputs:pop_left()
+  return amplifiers[#amplifiers].outputs:pop()
 end
 
 local source = io.read()

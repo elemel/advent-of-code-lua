@@ -1,4 +1,27 @@
-local deque = require("deque")
+local Queue = {}
+Queue.__index = Queue
+
+function Queue.new()
+  return setmetatable({first = 1, last = 0}, Queue)
+end
+
+function Queue:push(value)
+  assert(value ~= nil, "Nil value")
+  self.last = self.last + 1
+  self[self.last] = value
+end
+
+function Queue:pop()
+  assert(self.first <= self.last, "Empty queue")
+  local result = self[self.first]
+  self[self.first] = nil
+  self.first = self.first + 1
+  return result
+end
+
+function Queue:isEmpty()
+  return self.first > self.last
+end
 
 local function read(program, param)
   local divisor = 10 ^ (param + 1)
@@ -31,14 +54,14 @@ local function multiply(program)
 end
 
 local function input(program)
-  local value = assert(program.inputs:pop_left(), "Empty input")
+  local value = program.inputs:pop()
   write(program, 1, value)
   program.ip = program.ip + 2
 end
 
 local function output(program)
   local value = read(program, 1)
-  program.outputs:push_right(value)
+  program.outputs:push(value)
   program.ip = program.ip + 2
 end
 
@@ -95,7 +118,7 @@ local function step(program)
 
   local opcode = program[program.ip] % 100
 
-  if opcode == 3 and program.inputs:is_empty() then
+  if opcode == 3 and program.inputs:isEmpty() then
     return false
   end
 
@@ -124,8 +147,8 @@ local function compile(source)
 
   program.ip = 0
 
-  program.inputs = deque.new()
-  program.outputs = deque.new()
+  program.inputs = Queue.new()
+  program.outputs = Queue.new()
 
   return program
 end

@@ -10,10 +10,10 @@ local function signal(source, phases)
 
   for phase in elements(phases) do
     local amplifier = intcode.compile(source)
-    amplifier.inputs:push_right(phase)
-    amplifier.inputs:push_right(result)
+    amplifier.inputs:push(phase)
+    amplifier.inputs:push(result)
     intcode.run(amplifier)
-    result = amplifier.outputs:pop_left()
+    result = amplifier.outputs:pop()
   end
 
   return result

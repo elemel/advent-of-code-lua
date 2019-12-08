@@ -38,8 +38,8 @@ end
 
 for y = 1, height do
   print(join(
-    range(1, width)
-    :map(function(x)
+    range(1, width):
+    map(function(x)
       return findColor(image, x, y) == 1 and "#" or " "
     end)))
 end
