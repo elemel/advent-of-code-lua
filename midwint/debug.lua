@@ -70,6 +70,10 @@ local function printInstruction(program, instructionPointer)
   local size = instructionSizes[opcode] or 1
   local params = {}
 
+  if program.breakpoints[instructionPointer] then
+    label = "*" .. label
+  end
+
   for j = 1, size - 1 do
     params[j] = string.format(
       "%16s", formatParam(program, instructionPointer, j))

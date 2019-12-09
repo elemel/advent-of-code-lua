@@ -144,6 +144,7 @@ function Program.new(source)
   program.outputQueue = Queue.new()
 
   program.labels = {}
+  program.breakpoints = {}
 
   return setmetatable(program, Program)
 end
@@ -168,7 +169,7 @@ end
 
 function Program:run()
   for result = 0, math.huge do
-    if not self:step() then
+    if not self:step() or self.breakpoints[self.instructionPointer] then
       return result
     end
   end
