@@ -1,13 +1,14 @@
 local operationNames = {
   [1] = "add",
-  [2] = "multiply",
-  [3] = "input",
-  [4] = "output",
-  [5] = "jumpIfTrue",
-  [6] = "jumpIfFalse",
-  [7] = "lessThan",
-  [8] = "equals",
-  [99] = "halt",
+  [2] = "mul",
+  [3] = "in",
+  [4] = "out",
+  [5] = "jit",
+  [6] = "jif",
+  [7] = "lt",
+  [8] = "eq",
+  [9] = "arb",
+  [99] = "hcf",
 }
 
 local operationSizes = {
@@ -19,6 +20,7 @@ local operationSizes = {
   [6] = 3,
   [7] = 4,
   [8] = 4,
+  [9] = 2,
   [99] = 1,
 }
 
@@ -34,13 +36,14 @@ local function formatParam(program, ip, param)
   if mode == 0 then
     local value = program[address] or "?"
     return address .. ":" .. value
-  end
-
-  if mode == 1 then
+  elseif mode == 1 then
     return address
+  elseif mode == 2 then
+    local value = program[address + program.relativeBase] or "?"
+    return address .. "+" .. program.relativeBase .. ":" .. value
+  else
+    return "?"
   end
-
-  return "?"
 end
 
 local function formatQueue(queue)

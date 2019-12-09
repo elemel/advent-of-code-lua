@@ -4,12 +4,30 @@ local function read(program, param)
   local divisor = 10 ^ (param + 1)
   local mode = math.floor(program[program.ip] / divisor) % 10
   local address = program[program.ip + param]
-  return mode == 0 and program[address] or address
+
+  if mode == 0 then
+    return program[address] or 0
+  elseif mode == 1 then
+    return address
+  elseif mode == 2 then
+    return program[address + program.relativeBase] or 0
+  else
+    error("Invalid parameter mode")
+  end
 end
 
 local function write(program, param, value)
+  local divisor = 10 ^ (param + 1)
+  local mode = math.floor(program[program.ip] / divisor) % 10
   local address = program[program.ip + param]
-  program[address] = value
+
+  if mode == 0 then
+    program[address] = value
+  elseif mode == 2 then
+    program[address + program.relativeBase] = value
+  else
+    error("Invalid parameter mode")
+  end
 end
 
 local function add(program)
@@ -72,6 +90,12 @@ local function equals(program)
   program.ip = program.ip + 4
 end
 
+local function adjustRelativeBase(program)
+  local value = read(program, 1)
+  program.relativeBase = program.relativeBase + value
+  program.ip = program.ip + 2
+end
+
 local function halt(program)
   program.ip = nil
 end
@@ -85,6 +109,7 @@ local operations = {
   [6] = jumpIfFalse,
   [7] = lessThan,
   [8] = equals,
+  [9] = adjustRelativeBase,
   [99] = halt,
 }
 
@@ -101,6 +126,7 @@ function Program.new(source)
   end
 
   program.ip = 0
+  program.relativeBase = 0
 
   program.inputs = Queue.new()
   program.outputs = Queue.new()
