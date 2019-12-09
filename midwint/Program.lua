@@ -1,9 +1,10 @@
 local Queue = require("midwint.Queue")
 
 local function read(program, param)
+  local opcode = program[program.instructionPointer] or 0
   local divisor = 10 ^ (param + 1)
-  local mode = math.floor(program[program.ip] / divisor) % 10
-  local address = program[program.ip + param]
+  local mode = math.floor(opcode / divisor) % 10
+  local address = program[program.instructionPointer + param] or 0
 
   if mode == 0 then
     return program[address] or 0
@@ -17,9 +18,10 @@ local function read(program, param)
 end
 
 local function write(program, param, value)
+  local opcode = program[program.instructionPointer] or 0
   local divisor = 10 ^ (param + 1)
-  local mode = math.floor(program[program.ip] / divisor) % 10
-  local address = program[program.ip + param]
+  local mode = math.floor(opcode / divisor) % 10
+  local address = program[program.instructionPointer + param] or 0
 
   if mode == 0 then
     program[address] = value
@@ -36,7 +38,7 @@ local function add(program)
 
   local result = left + right
   write(program, 3, result)
-  program.ip = program.ip + 4
+  program.instructionPointer = program.instructionPointer + 4
 end
 
 local function multiply(program)
@@ -45,31 +47,41 @@ local function multiply(program)
 
   local result = left * right
   write(program, 3, result)
-  program.ip = program.ip + 4
+  program.instructionPointer = program.instructionPointer + 4
 end
 
 local function input(program)
-  local value = program.inputs:pop()
+  local value = program.inputQueue:pop()
   write(program, 1, value)
-  program.ip = program.ip + 2
+  program.instructionPointer = program.instructionPointer + 2
 end
 
 local function output(program)
   local value = read(program, 1)
-  program.outputs:push(value)
-  program.ip = program.ip + 2
+  program.outputQueue:push(value)
+  program.instructionPointer = program.instructionPointer + 2
 end
 
 local function jumpIfTrue(program)
   local value = read(program, 1)
   local address = read(program, 2)
-  program.ip = value ~= 0 and address or program.ip + 3
+
+  if value ~= 0 then
+    program.instructionPointer = address
+  else
+    program.instructionPointer = program.instructionPointer + 3
+  end
 end
 
 local function jumpIfFalse(program)
   local value = read(program, 1)
   local address = read(program, 2)
-  program.ip = value == 0 and address or program.ip + 3
+
+  if value == 0 then
+    program.instructionPointer = address
+  else
+    program.instructionPointer = program.instructionPointer + 3
+  end
 end
 
 local function lessThan(program)
@@ -78,7 +90,7 @@ local function lessThan(program)
 
   local result = left < right and 1 or 0
   write(program, 3, result)
-  program.ip = program.ip + 4
+  program.instructionPointer = program.instructionPointer + 4
 end
 
 local function equals(program)
@@ -87,17 +99,17 @@ local function equals(program)
 
   local result = left == right and 1 or 0
   write(program, 3, result)
-  program.ip = program.ip + 4
+  program.instructionPointer = program.instructionPointer + 4
 end
 
 local function adjustRelativeBase(program)
   local value = read(program, 1)
   program.relativeBase = program.relativeBase + value
-  program.ip = program.ip + 2
+  program.instructionPointer = program.instructionPointer + 2
 end
 
 local function halt(program)
-  program.ip = nil
+  program.instructionPointer = nil
 end
 
 local operations = {
@@ -125,23 +137,24 @@ function Program.new(source)
     address = address + 1
   end
 
-  program.ip = 0
+  program.instructionPointer = 0
   program.relativeBase = 0
 
-  program.inputs = Queue.new()
-  program.outputs = Queue.new()
+  program.inputQueue = Queue.new()
+  program.outputQueue = Queue.new()
 
   return setmetatable(program, Program)
 end
 
 function Program:step()
-  if not self.ip then
+  if not self.instructionPointer then
     return false
   end
 
-  local opcode = self[self.ip] % 100
+  local opcode = self[self.instructionPointer] or 0
+  opcode = opcode % 100
 
-  if opcode == 3 and self.inputs:isEmpty() then
+  if opcode == 3 and self.inputQueue:isEmpty() then
     return false
   end
 
@@ -157,6 +170,10 @@ function Program:run()
       return result
     end
   end
+end
+
+function Program:isHalted()
+  return self.instructionPointer == nil
 end
 
 return Program

@@ -10,10 +10,10 @@ local function signal(source, phases)
 
   for phase in elements(phases) do
     local amplifier = midwint.Program.new(source)
-    amplifier.inputs:push(phase)
-    amplifier.inputs:push(result)
+    amplifier.inputQueue:push(phase)
+    amplifier.inputQueue:push(result)
     amplifier:run()
-    result = amplifier.outputs:pop()
+    result = amplifier.outputQueue:pop()
   end
 
   return result

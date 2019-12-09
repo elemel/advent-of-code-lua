@@ -2,9 +2,9 @@ local midwint = require("midwint")
 
 local source = io.read()
 local program = midwint.Program.new(source)
-program.inputs:push(1)
+program.inputQueue:push(1)
 program:run()
 
-while not program.outputs:isEmpty() do
-  print(program.outputs:pop())
+while not program.outputQueue:isEmpty() do
+  print(program.outputQueue:pop())
 end

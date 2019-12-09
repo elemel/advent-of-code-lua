@@ -24,10 +24,11 @@ local operationSizes = {
   [99] = 1,
 }
 
-local function formatParam(program, ip, param)
+local function formatParam(program, instructionPointer, param)
+  local opcode = program[instructionPointer] or 0
   local divisor = 10 ^ (param + 1)
-  local mode = math.floor(program[ip] / divisor) % 10
-  local address = program[ip + param]
+  local mode = math.floor(program[instructionPointer] / divisor) % 10
+  local address = program[instructionPointer + param]
 
   if address == nil then
     return "?"
@@ -57,86 +58,102 @@ local function formatQueue(queue)
 end
 
 local function list(program, n)
-  n = n or 1
+  n = n or 16
+  local instructionPointer = program.instructionPointer
 
-  if not program.ip then
+  if not instructionPointer then
     print("Program is halted")
 
-    if not program.outputs:isEmpty() then
-      print("Output queue: " .. formatQueue(program.outputs))
+    if not program.inputQueue:isEmpty() then
+      print("Input queue: " .. formatQueue(program.inputQueue))
+    end
+
+    if not program.outputQueue:isEmpty() then
+      print("Output queue: " .. formatQueue(program.outputQueue))
     end
 
     return
   end
 
-  local opcode = program[program.ip] % 100
+  local opcode = program[instructionPointer] or 0
+  opcode = opcode % 100
 
-  if opcode == 3 and program.inputs:isEmpty() then
+  if opcode == 3 and program.inputQueue:isEmpty() then
     print("Empty input queue")
   end
 
-  local ip = program.ip
-
   for i = 1, n do
-    if not program[ip] then
+    if not program[instructionPointer] then
       break
     end
 
-    local opcode = program[ip] % 100
-
+    local opcode = program[instructionPointer]
+    opcode = opcode % 100
     local name = operationNames[opcode] or opcode
     local size = operationSizes[opcode] or 1
     local params = {}
 
     for j = 1, size - 1 do
-      params[j] = string.format("%-16s", formatParam(program, ip, j))
+      params[j] = string.format(
+        "%16s", formatParam(program, instructionPointer, j))
     end
 
-    print(string.format("%-16s%-16s%s", ip, name, table.concat(params)))
-    ip = ip + size
+    print(string.format(
+      "%12s:%-3s  %s",
+      instructionPointer,
+      name,
+      table.concat(params, "  ")))
+
+    instructionPointer = instructionPointer + size
   end
 end
 
 local function step(program)
   program:step()
-  list(program)
+  list(program, 1)
 end
 
 local function run(program)
   program:run()
-  list(program)
+  list(program, 1)
 end
 
 local function inputs(program)
-  if program.inputs:isEmpty() then
+  if program.inputQueue:isEmpty() then
     print("Empty input queue")
     return
   end
 
-  print("Input queue: " .. formatQueue(program.inputs))
+  print("Input queue: " .. formatQueue(program.inputQueue))
 end
 
 local function outputs(program)
-  if program.outputs:isEmpty() then
+  if program.outputQueue:isEmpty() then
     print("Empty output queue")
     return
   end
 
-  print("Output queue: " .. formatQueue(program.outputs))
+  print("Output queue: " .. formatQueue(program.outputQueue))
 end
 
 local function pushInput(program, value)
-  program.inputs:push(value)
+  program.inputQueue:push(value)
   inputs(program)
 end
 
 local function popOutput(program)
-  if program.outputs:isEmpty() then
+  if program.outputQueue:isEmpty() then
     print("Empty output queue")
     return
   end
 
-  return program.outputs:pop()
+  local value = program.outputQueue:pop()
+
+  if not program.outputQueue:isEmpty() then
+    print("Output queue: " .. formatQueue(program.outputQueue))
+  end
+
+  return value
 end
 
 return {
