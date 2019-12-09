@@ -11,7 +11,7 @@ local function read(program, param)
   elseif mode == 1 then
     return address
   elseif mode == 2 then
-    return program[address + program.relativeBase] or 0
+    return program[program.relativeBase + address] or 0
   else
     error("Invalid parameter mode")
   end
@@ -26,7 +26,7 @@ local function write(program, param, value)
   if mode == 0 then
     program[address] = value
   elseif mode == 2 then
-    program[address + program.relativeBase] = value
+    program[program.relativeBase + address] = value
   else
     error("Invalid parameter mode")
   end

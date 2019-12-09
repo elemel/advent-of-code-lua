@@ -40,8 +40,8 @@ local function formatParam(program, instructionPointer, param)
   elseif mode == 1 then
     return address
   elseif mode == 2 then
-    local value = program[address + program.relativeBase] or "?"
-    return address .. "+" .. program.relativeBase .. ":" .. value
+    local value = program[program.relativeBase + address] or "?"
+    return program.relativeBase .. "+" .. address .. ":" .. value
   else
     return "?"
   end
