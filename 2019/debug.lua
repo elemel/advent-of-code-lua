@@ -7,8 +7,10 @@ status = midwint.debug.status
 step = midwint.debug.step
 write = midwint.debug.write
 
-function day(i)
-  local filename = string.format("2019/12/%02d/input.txt", i)
+function newProgram9()
+  local filename = string.format("2019/12/09/input.txt")
   local source = io.open(filename):read()
-  return midwint.Program.new(source)
+  local program = midwint.Program.new(source)
+  program.labels[53] = "fail1"
+  return program
 end

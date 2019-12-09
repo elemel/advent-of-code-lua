@@ -143,6 +143,8 @@ function Program.new(source)
   program.inputQueue = Queue.new()
   program.outputQueue = Queue.new()
 
+  program.labels = {}
+
   return setmetatable(program, Program)
 end
 

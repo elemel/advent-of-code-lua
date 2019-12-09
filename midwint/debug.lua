@@ -25,10 +25,11 @@ local instructionSizes = {
 }
 
 local function formatParam(program, instructionPointer, param)
-  local opcode = program[instructionPointer] or 0
+  local opcodeModes = program[instructionPointer] or 0
   local divisor = 10 ^ (param + 1)
-  local mode = math.floor(program[instructionPointer] / divisor) % 10
+  local mode = math.floor(opcodeModes / divisor) % 10
   local address = program[instructionPointer + param]
+  local opcode = opcodeModes % 100
 
   if address == nil then
     return "?"
@@ -38,6 +39,10 @@ local function formatParam(program, instructionPointer, param)
     local value = program[address] or "?"
     return address .. ":" .. value
   elseif mode == 1 then
+    if opcode == 5 or opcode == 6 then
+      address = program.labels[address] or address
+    end
+
     return address
   elseif mode == 2 then
     local value = program[program.relativeBase + address] or "?"
@@ -60,6 +65,7 @@ end
 local function printInstruction(program, instructionPointer)
   local opcode = program[instructionPointer]
   opcode = opcode % 100
+  local label = program.labels[instructionPointer] or instructionPointer
   local name = operationNames[opcode] or opcode
   local size = instructionSizes[opcode] or 1
   local params = {}
@@ -71,7 +77,7 @@ local function printInstruction(program, instructionPointer)
 
   print(string.format(
     "%12s:%-3s  %s",
-    instructionPointer,
+    label,
     name,
     table.concat(params, "  ")))
 
