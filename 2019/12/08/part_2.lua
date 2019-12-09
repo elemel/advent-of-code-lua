@@ -37,9 +37,9 @@ for z = 1, layerCount do
 end
 
 for y = 1, height do
-  print(join(
-    range(1, width):
-    map(function(x)
+  print(join(map(
+    range(1, width),
+    function(x)
       return findColor(image, x, y) == 1 and "#" or " "
     end)))
 end

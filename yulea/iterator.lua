@@ -123,11 +123,11 @@ local function range(first, last, step)
   last = last or math.huge
   step = step or 1
 
-  return Stream.new(coroutine.wrap(function()
+  return coroutine.wrap(function()
     for i = first, last, step do
       coroutine.yield(i)
     end
-  end))
+  end)
 end
 
 local function reduce(iterator, reducer, init)
@@ -152,6 +152,10 @@ local function rep(v, n)
   end)
 end
 
+local function stream(iterator)
+  return Stream.new(iterator)
+end
+
 local function take(iterator, n)
   return coroutine.wrap(function()
     for i = 1, n do
@@ -173,5 +177,6 @@ return {
   range = range,
   reduce = reduce,
   rep = rep,
+  stream = stream,
   take = take,
 }

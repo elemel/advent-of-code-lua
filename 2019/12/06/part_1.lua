@@ -3,6 +3,7 @@ local yulea = require("yulea")
 local count = yulea.count
 local keys = yulea.keys
 local map = yulea.map
+local stream = yulea.stream
 local sum = yulea.sum
 
 local parents = {}
@@ -20,6 +21,6 @@ local function ancestors(object)
 end
 
 print(sum(
-  keys(parents):
+  stream(keys(parents)):
   map(ancestors):
   map(count)))

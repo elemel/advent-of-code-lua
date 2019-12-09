@@ -1,7 +1,9 @@
 local midwint = require("midwint")
 local yulea = require("yulea")
 
+local all = yulea.all
 local elements = yulea.elements
+local map = yulea.map
 local maxResult = yulea.maxResult
 local permutations = yulea.permutations
 
@@ -21,26 +23,19 @@ local function signal(source, phases)
 
   amplifiers[1].inputQueue:push(0)
 
-  while true do
-    local allHalted = true
-
+  repeat
     for amplifier in elements(amplifiers) do
       amplifier:run()
-      allHalted = allHalted and amplifier:isHalted()
     end
-
-    if allHalted then
-      break
-    end
-  end
+  until all(map(
+    elements(amplifiers),
+    function(amplifier) return amplifier:isHalted() end))
 
   return amplifiers[#amplifiers].outputQueue:pop()
 end
 
 local source = io.read()
 
-print(maxResult(
-  permutations({5, 6, 7, 8, 9}):
-  map(function(phases)
-    return signal(source, phases)
-  end)))
+print(maxResult(map(
+  permutations({5, 6, 7, 8, 9}),
+  function(phases) return signal(source, phases) end)))

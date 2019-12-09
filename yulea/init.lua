@@ -13,6 +13,8 @@ return {
   string = yuleaString,
   table = yuleaTable,
 
+  all = yuleaMath.all,
+  any = yuleaMath.any,
   array = yuleaTable.array,
   count = yuleaIterator.count,
   cycle = yuleaIterator.cycle,
@@ -31,5 +33,6 @@ return {
   range = yuleaIterator.range,
   reduce = yuleaIterator.reduce,
   split = yuleaString.split,
+  stream = yuleaIterator.stream,
   sum = yuleaMath.sum,
 }

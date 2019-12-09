@@ -6,11 +6,12 @@ local elements = yulea.elements
 local firstDuplicate = yulea.firstDuplicate
 local isSorted = yulea.isSorted
 local range = yulea.range
+local stream = yulea.stream
 
 local first, last = string.match(io.read(), "(%d+)-(%d+)")
 
 print(count(
-  range(tonumber(first), tonumber(last)):
+  stream(range(tonumber(first), tonumber(last))):
   map(digits):
   filter(isSorted):
   filter(function(password)

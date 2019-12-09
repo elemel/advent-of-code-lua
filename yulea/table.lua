@@ -1,5 +1,3 @@
-local Stream = require("yulea.Stream")
-
 local function array(iterator, result, first, last, step)
   result = result or {}
   first = first or 1
@@ -86,10 +84,10 @@ end
 local function keys(t)
   local k
 
-  return Stream.new(function()
+  return function()
     k = next(t, k)
     return k
-  end)
+  end
 end
 
 local function mapValues(t, mapper, result)
@@ -136,7 +134,7 @@ local function permgen(a, n)
 end
 
 local function permutations(t)
-  return Stream.new(coroutine.wrap(function() permgen(t, #t) end))
+  return coroutine.wrap(function() permgen(t, #t) end)
 end
 
 local function reverse(t)
@@ -154,10 +152,10 @@ end
 local function values(t)
   local k, v
 
-  return Stream.new(function()
+  return function()
     k, v = next(t, k)
     return v
-  end)
+  end
 end
 
 return {

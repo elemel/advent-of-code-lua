@@ -9,6 +9,26 @@ local function accumulate(iterator)
   end)
 end
 
+local function all(iterator)
+  local result = true
+
+  for element in iterator do
+    result = result and element
+  end
+
+  return result
+end
+
+local function any(iterator)
+  local result = false
+
+  for element in iterator do
+    result = result or element
+  end
+
+  return result
+end
+
 local function digits(n, base)
   base = base or 10
   local result = {}
@@ -67,6 +87,8 @@ end
 
 return {
   accumulate = accumulate,
+  all = all,
+  any = any,
   digits = digits,
   maxResult = maxResult,
   minResult = minResult,
