@@ -57,8 +57,29 @@ local function formatQueue(queue)
   return table.concat(t, ", ")
 end
 
+local function printInstruction(program, instructionPointer)
+  local opcode = program[instructionPointer]
+  opcode = opcode % 100
+  local name = operationNames[opcode] or opcode
+  local size = instructionSizes[opcode] or 1
+  local params = {}
+
+  for j = 1, size - 1 do
+    params[j] = string.format(
+      "%16s", formatParam(program, instructionPointer, j))
+  end
+
+  print(string.format(
+    "%12s:%-3s  %s",
+    instructionPointer,
+    name,
+    table.concat(params, "  ")))
+
+  return size
+end
+
 local function list(program, n)
-  n = n or 16
+  n = n or 10
 
   if program:isHalted() then
     print("Program is halted")
@@ -85,66 +106,12 @@ local function list(program, n)
       break
     end
 
-    local opcode = program[instructionPointer]
-    opcode = opcode % 100
-    local name = operationNames[opcode] or opcode
-    local size = instructionSizes[opcode] or 1
-    local params = {}
-
-    for j = 1, size - 1 do
-      params[j] = string.format(
-        "%16s", formatParam(program, instructionPointer, j))
-    end
-
-    print(string.format(
-      "%12s:%-3s  %s",
-      instructionPointer,
-      name,
-      table.concat(params, "  ")))
-
+    local size = printInstruction(program, instructionPointer)
     instructionPointer = instructionPointer + size
   end
 end
 
-local function step(program)
-  program:step()
-  list(program, 1)
-end
-
-local function run(program)
-  program:run()
-  list(program, 1)
-end
-
-local function inputQueue(program)
-  if program.inputQueue:isEmpty() then
-    print("Empty input queue")
-    return
-  end
-
-  print("Input queue: " .. formatQueue(program.inputQueue))
-end
-
-local function loadProgram(filename)
-  local source = io.open(filename):read()
-  return midwint.Program.new(source)
-end
-
-local function outputQueue(program)
-  if program.outputQueue:isEmpty() then
-    print("Empty output queue")
-    return
-  end
-
-  print("Output queue: " .. formatQueue(program.outputQueue))
-end
-
-local function pushInput(program, value)
-  program.inputQueue:push(value)
-  inputQueue(program)
-end
-
-local function popOutput(program)
+local function read(program)
   if program.outputQueue:isEmpty() then
     print("Empty output queue")
     return
@@ -159,13 +126,48 @@ local function popOutput(program)
   return value
 end
 
+local function run(program)
+  program:run()
+  list(program, 1)
+end
+
+local function step(program)
+  program:step()
+  list(program, 1)
+end
+
+local function status(program)
+  if program:isHalted() then
+    print("Program is halted")
+  end
+
+  if program:isBlocked() then
+    print("Program is blocked")
+  end
+
+  if program.inputQueue:isEmpty() then
+    print("Empty input queue")
+  else
+    print("Input queue: " .. formatQueue(program.inputQueue))
+  end
+
+  if program.outputQueue:isEmpty() then
+    print("Empty output queue")
+  else
+    print("Output queue: " .. formatQueue(program.outputQueue))
+  end
+end
+
+local function write(program, value)
+  program.inputQueue:push(value)
+  print("Input queue: " .. formatQueue(program.inputQueue))
+end
+
 return {
-  inputQueue = inputQueue,
   list = list,
-  loadProgram = loadProgram,
-  outputQueue = outputQueue,
-  popOutput = popOutput,
-  pushInput = pushInput,
+  read = read,
   run = run,
+  status = status,
   step = step,
+  write = write,
 }
