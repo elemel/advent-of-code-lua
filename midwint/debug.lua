@@ -11,7 +11,7 @@ local operationNames = {
   [99] = "hcf",
 }
 
-local operationSizes = {
+local instructionSizes = {
   [1] = 4,
   [2] = 4,
   [3] = 2,
@@ -59,9 +59,8 @@ end
 
 local function list(program, n)
   n = n or 16
-  local instructionPointer = program.instructionPointer
 
-  if not instructionPointer then
+  if program:isHalted() then
     print("Program is halted")
 
     if not program.inputQueue:isEmpty() then
@@ -75,12 +74,11 @@ local function list(program, n)
     return
   end
 
-  local opcode = program[instructionPointer] or 0
-  opcode = opcode % 100
-
-  if opcode == 3 and program.inputQueue:isEmpty() then
-    print("Empty input queue")
+  if program:isBlocked() then
+    print("Program is blocked")
   end
+
+  local instructionPointer = program.instructionPointer
 
   for i = 1, n do
     if not program[instructionPointer] then
@@ -90,7 +88,7 @@ local function list(program, n)
     local opcode = program[instructionPointer]
     opcode = opcode % 100
     local name = operationNames[opcode] or opcode
-    local size = operationSizes[opcode] or 1
+    local size = instructionSizes[opcode] or 1
     local params = {}
 
     for j = 1, size - 1 do
@@ -118,7 +116,7 @@ local function run(program)
   list(program, 1)
 end
 
-local function inputs(program)
+local function inputQueue(program)
   if program.inputQueue:isEmpty() then
     print("Empty input queue")
     return
@@ -127,7 +125,12 @@ local function inputs(program)
   print("Input queue: " .. formatQueue(program.inputQueue))
 end
 
-local function outputs(program)
+local function loadProgram(filename)
+  local source = io.open(filename):read()
+  return midwint.Program.new(source)
+end
+
+local function outputQueue(program)
   if program.outputQueue:isEmpty() then
     print("Empty output queue")
     return
@@ -138,7 +141,7 @@ end
 
 local function pushInput(program, value)
   program.inputQueue:push(value)
-  inputs(program)
+  inputQueue(program)
 end
 
 local function popOutput(program)
@@ -157,9 +160,10 @@ local function popOutput(program)
 end
 
 return {
-  inputs = inputs,
+  inputQueue = inputQueue,
   list = list,
-  outputs = outputs,
+  loadProgram = loadProgram,
+  outputQueue = outputQueue,
   popOutput = popOutput,
   pushInput = pushInput,
   run = run,

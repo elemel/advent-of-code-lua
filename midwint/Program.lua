@@ -172,6 +172,11 @@ function Program:run()
   end
 end
 
+function Program:isBlocked()
+  local opcode = self.instructionPointer and self[self.instructionPointer] or 0
+  return opcode % 100 == 3 and self.inputQueue:isEmpty()
+end
+
 function Program:isHalted()
   return self.instructionPointer == nil
 end
