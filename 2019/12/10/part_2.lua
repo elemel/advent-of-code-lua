@@ -3,6 +3,7 @@ local yulea = require("yulea")
 local enumerate = yulea.enumerate
 local gcd = yulea.gcd
 local split = yulea.split
+local squaredDistance2 = yulea.squaredDistance2
 
 local x = 31
 local y = 20
@@ -48,17 +49,13 @@ for y2 = minY, maxY do
   end
 end
 
-function distance(position)
-  local x2, y2 = table.unpack(position)
-  return (x2 - x) * (y2 - y)
-end
-
 local sortedGroups = {}
 
 for dy, row in pairs(groups) do
   for dx, positions in pairs(row) do
     table.sort(positions, function(a, b)
-      return distance(a) < distance(b)
+      return (squaredDistance2(x, y, table.unpack(a)) >
+        squaredDistance2(x, y, table.unpack(b)))
     end)
 
     table.insert(sortedGroups, {{dx, dy}, positions})

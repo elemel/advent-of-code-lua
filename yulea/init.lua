@@ -35,6 +35,8 @@ return {
   range = yuleaIterator.range,
   reduce = yuleaIterator.reduce,
   split = yuleaString.split,
+  squaredDistance2 = yuleaMath.squaredDistance2,
+  squaredLength2 = yuleaMath.squaredLength2,
   stream = yuleaIterator.stream,
   sum = yuleaMath.sum,
 }

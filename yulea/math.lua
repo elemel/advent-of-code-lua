@@ -83,6 +83,14 @@ local function minResult(iterator)
   return result
 end
 
+local function squaredDistance2(x1, y1, x2, y2)
+  return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)
+end
+
+local function squaredLength2(x, y)
+  return x * x + y * y
+end
+
 local function sum(iterator)
   local result = 0
 
@@ -101,5 +109,7 @@ return {
   gcd = gcd,
   maxResult = maxResult,
   minResult = minResult,
+  squaredLength2 = squaredLength2,
+  squaredDistance2 = squaredDistance2,
   sum = sum,
 }
