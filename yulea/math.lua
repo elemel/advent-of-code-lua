@@ -51,6 +51,14 @@ local function digits(n, base)
   return result
 end
 
+local function gcd(a, b)
+  while b ~= 0 do
+      a, b = b, a % b
+  end
+
+  return math.abs(a)
+end
+
 local function maxResult(iterator)
   local result
 
@@ -90,6 +98,7 @@ return {
   all = all,
   any = any,
   digits = digits,
+  gcd = gcd,
   maxResult = maxResult,
   minResult = minResult,
   sum = sum,
