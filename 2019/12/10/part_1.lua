@@ -4,57 +4,50 @@ local enumerate = yulea.enumerate
 local gcd = yulea.gcd
 local split = yulea.split
 
-local grid = {}
+local asteroids = {}
 
 for y, line in enumerate(io.lines(), 0) do
-  grid[y] = {}
-
   for x, char in enumerate(split(line), 0) do
-    grid[y][x] = char
+    if char ~= "." then
+      asteroids[y] = asteroids[y] or {}
+      asteroids[y][x] = char
+    end
   end
 end
-
-local minX = 0
-local minY = 0
-
-local maxX = #grid[0]
-local maxY = #grid
 
 local maxCount = -math.huge
 local bestLocationX, bestLocationY
 
-for y = minY, maxY do
-  for x = minX, maxX do
-    if grid[y][x] ~= "." then
-      local seen = {}
-      local count = 0
+for y1, row1 in pairs(asteroids) do
+  for x1, char1 in pairs(row1) do
+    local seen = {}
+    local count = 0
 
-      for y2 = minY, maxY do
-        for x2 = minX, maxX do
-          if (x2 ~= x or y2 ~= y) and grid[y2][x2] ~= "." then
-            local dx = x2 - x
-            local dy = y2 - y
+    for y2, row2 in pairs(asteroids) do
+      for x2, char2 in pairs(row2) do
+        if x2 ~= x1 or y2 ~= y1 then
+          local dx = x2 - x1
+          local dy = y2 - y1
 
-            local d = gcd(dx, dy)
+          local d = gcd(dx, dy)
 
-            dx = dx / d
-            dy = dy / d
+          dx = dx / d
+          dy = dy / d
 
-            if not (seen[dy] and seen[dy][dx]) then
-              seen[dy] = seen[dy] or {}
-              seen[dy][dx] = true
+          if not seen[dy] or not seen[dy][dx] then
+            seen[dy] = seen[dy] or {}
+            seen[dy][dx] = true
 
-              count = count + 1
-            end
+            count = count + 1
           end
         end
       end
+    end
 
-      if count > maxCount then
-        maxCount = count
-        bestLocationX = x
-        bestLocationY = y
-      end
+    if count > maxCount then
+      maxCount = count
+      bestLocationX = x1
+      bestLocationY = y1
     end
   end
 end

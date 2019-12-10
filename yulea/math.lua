@@ -29,6 +29,54 @@ local function any(iterator)
   return result
 end
 
+local function rankDirection(x, y)
+  if x < 0 then
+    if y < 0 then
+      -- Southwest
+      return 6, -y, -x
+    elseif 0 < y then
+      -- Northwest
+      return 4, -x, y
+    else
+      -- West
+      return 5, 0, -x
+    end
+  elseif 0 < x then
+    if y < 0 then
+      -- Southeast
+      return 8, x, -y
+    elseif 0 < y then
+      -- Northeast
+      return 2, y, x
+    else
+      -- East
+      return 1, 0, x
+    end
+  else
+    if y < 0 then
+      -- South
+      return 7, 0, -y
+    elseif 0 < y then
+      -- North
+      return 3, 0, y
+    else
+      -- Origin
+      return 0, 0, 1
+    end
+  end
+end
+
+local function compareDirections(x1, y1, x2, y2)
+  local a1, b1, c1 = rankDirection(x1, y1)
+  local a2, b2, c2 = rankDirection(x2, y2)
+
+  if a1 ~= a2 then
+    return a1 < a2
+  end
+
+  return b1 * c2 < b2 * c1
+end
+
 local function digits(n, base)
   base = base or 10
   local result = {}
@@ -83,11 +131,11 @@ local function minResult(iterator)
   return result
 end
 
-local function squaredDistance2(x1, y1, x2, y2)
+local function squaredDistance(x1, y1, x2, y2)
   return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)
 end
 
-local function squaredLength2(x, y)
+local function squaredLength(x, y)
   return x * x + y * y
 end
 
@@ -105,11 +153,12 @@ return {
   accumulate = accumulate,
   all = all,
   any = any,
+  compareDirections = compareDirections,
   digits = digits,
   gcd = gcd,
   maxResult = maxResult,
   minResult = minResult,
-  squaredLength2 = squaredLength2,
-  squaredDistance2 = squaredDistance2,
+  squaredLength = squaredLength,
+  squaredDistance = squaredDistance,
   sum = sum,
 }

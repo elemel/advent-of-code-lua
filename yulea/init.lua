@@ -16,6 +16,7 @@ return {
   all = yuleaMath.all,
   any = yuleaMath.any,
   array = yuleaTable.array,
+  compareDirections = yuleaMath.compareDirections,
   count = yuleaIterator.count,
   cycle = yuleaIterator.cycle,
   digits = yuleaMath.digits,
@@ -35,8 +36,8 @@ return {
   range = yuleaIterator.range,
   reduce = yuleaIterator.reduce,
   split = yuleaString.split,
-  squaredDistance2 = yuleaMath.squaredDistance2,
-  squaredLength2 = yuleaMath.squaredLength2,
+  squaredDistance = yuleaMath.squaredDistance,
+  squaredLength = yuleaMath.squaredLength,
   stream = yuleaIterator.stream,
   sum = yuleaMath.sum,
 }
