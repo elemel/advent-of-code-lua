@@ -1,3 +1,5 @@
+local ansicolors = require("midwint.ansicolors")
+
 local operationNames = {
   [1] = "add",
   [2] = "mul",
@@ -24,6 +26,76 @@ local instructionSizes = {
   [99] = 1,
 }
 
+-- See: https://stackoverflow.com/a/49209650
+local function stripAnsi(s)
+  return string.gsub(s, "[\27\155][][()#;?%d]*[A-PRZcf-ntqry=><~]", "")
+end
+
+local function ansiLen(s)
+  return #stripAnsi(s)
+end
+
+local function leftAlign(s, w)
+  local n = ansiLen(s)
+
+  if n >= w then
+    return s
+  end
+
+  return s .. string.rep(" ", w - n)
+end
+
+local function rightAlign(s, w)
+  local n = ansiLen(s)
+
+  if n >= w then
+    return s
+  end
+
+  return string.rep(" ", w - n) .. s
+end
+
+local function blue(s)
+  return ansicolors("%{blue}" .. s)
+end
+
+local function cyan(s)
+  return ansicolors("%{cyan}" .. s)
+end
+
+local function green(s)
+  return ansicolors("%{green}" .. s)
+end
+
+local function magenta(s)
+  return ansicolors("%{magenta}" .. s)
+end
+
+local function red(s)
+  return ansicolors("%{red}" .. s)
+end
+
+local function yellow(s)
+  return ansicolors("%{yellow}" .. s)
+end
+
+local function readParam(program, instructionPointer, param)
+  local opcode = program[instructionPointer] or 0
+  local divisor = 10 ^ (param + 1)
+  local mode = math.floor(opcode / divisor) % 10
+  local address = program[instructionPointer + param] or 0
+
+  if mode == 0 then
+    return program[address] or 0
+  elseif mode == 1 then
+    return address
+  elseif mode == 2 then
+    return program[program.relativeBase + address] or 0
+  else
+    error("Invalid parameter mode")
+  end
+end
+
 local function formatParam(program, instructionPointer, param)
   local opcodeModes = program[instructionPointer] or 0
   local divisor = 10 ^ (param + 1)
@@ -37,16 +109,28 @@ local function formatParam(program, instructionPointer, param)
 
   if mode == 0 then
     local value = program[address] or "?"
-    return address .. ":" .. value
-  elseif mode == 1 then
-    if opcode == 5 or opcode == 6 then
-      address = program.labels[address] or address
+    local label = program.labels[address]
+
+    if label then
+      return cyan(label) .. ":" .. magenta(value)
     end
 
-    return address
+    return blue(address) .. ":" .. magenta(value)
+  elseif mode == 1 then
+    if opcode == 5 or opcode == 6 then
+      local label = program.labels[address]
+
+      if label then
+        return cyan(label)
+      end
+
+      return blue(address)
+    end
+
+    return magenta(address)
   elseif mode == 2 then
     local value = program[program.relativeBase + address] or "?"
-    return program.relativeBase .. "+" .. address .. ":" .. value
+    return blue(program.relativeBase .. "+" .. address) .. ":" .. magenta(value)
   else
     return "?"
   end
@@ -65,24 +149,64 @@ end
 local function printInstruction(program, instructionPointer)
   local opcode = program[instructionPointer]
   opcode = opcode % 100
-  local label = program.labels[instructionPointer] or instructionPointer
-  local name = operationNames[opcode] or opcode
+
+  local label = program.labels[instructionPointer]
+
+  if label then
+    label = cyan(label)
+  else
+    label = blue(instructionPointer)
+  end
+
+  local name = operationNames[opcode]
+
+  if name then
+    if name == "hcf" then
+      name = red(name)
+    elseif name == "in" then
+      if program.inputQueue:isEmpty() then
+        name = red(name)
+      else
+        name = yellow(name)
+      end
+    elseif name == "jif" then
+      local value = readParam(program, instructionPointer, 1)
+
+      if value == 0 then
+        name = green(name)
+      else
+        name = yellow(name)
+      end
+    elseif name == "jit" then
+      local value = readParam(program, instructionPointer, 1)
+
+      if value ~= 0 then
+        name = green(name)
+      else
+        name = yellow(name)
+      end
+    else
+      name = yellow(name)
+    end
+  else
+    name = opcode
+  end
+
   local size = instructionSizes[opcode] or 1
   local params = {}
 
   if program.breakpoints[instructionPointer] then
-    label = "*" .. label
+    label = yellow("*") .. label
   end
 
   for j = 1, size - 1 do
-    params[j] = string.format(
-      "%16s", formatParam(program, instructionPointer, j))
+    params[j] = rightAlign(formatParam(program, instructionPointer, j), 16)
   end
 
   print(string.format(
-    "%12s:%-3s  %s",
-    label,
-    name,
+    "%s:%s  %s",
+    rightAlign(label, 12),
+    leftAlign(name, 3),
     table.concat(params, "  ")))
 
   return size
