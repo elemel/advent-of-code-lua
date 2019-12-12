@@ -99,7 +99,7 @@ local function digits(n, base)
   return result
 end
 
-local function gcd(a, b)
+local function greatestCommonDivisor(a, b)
   while b ~= 0 do
       a, b = b, a % b
   end
@@ -131,6 +131,73 @@ local function minResult(iterator)
   return result
 end
 
+local memoizedPrimes = {2}
+
+local function primes()
+  return coroutine.wrap(function()
+    for _, p in ipairs(memoizedPrimes) do
+      coroutine.yield(p)
+    end
+
+    for i = memoizedPrimes[#memoizedPrimes] + 1, math.huge do
+      local isPrime = true
+
+      for _, p in ipairs(memoizedPrimes) do
+        if i % p == 0 then
+          isPrime = false
+          break
+        end
+      end
+
+      if isPrime then
+        memoizedPrimes[#memoizedPrimes + 1] = i
+        coroutine.yield(i)
+      end
+    end
+  end)
+end
+
+local function factors(i)
+  local result = {}
+
+  for p in primes() do
+    local n = 0
+
+    while i % p == 0 do
+      i = math.floor(i / p)
+      n = n + 1
+    end
+
+    if n > 0 then
+      result[p] = n
+    end
+
+    if i == 1 then
+      return result
+    end
+  end
+end
+
+local function leastCommonMultiple(iterator)
+  local common = {}
+
+  for i in iterator do
+    for f, n in pairs(factors(i)) do
+      common[f] = math.max(common[f] or 0, n)
+    end
+  end
+
+  local result = 1
+
+  for f, n in pairs(common) do
+    for i = 1, n do
+      result = result * f
+    end
+  end
+
+  return result
+end
+
 local function squaredDistance(x1, y1, x2, y2)
   return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)
 end
@@ -149,16 +216,33 @@ local function sum(iterator)
   return result
 end
 
+local function transpose(matrix)
+  local result = {}
+
+  for y, row in ipairs(matrix) do
+    for x, value in ipairs(row) do
+      result[x] = result[x] or {}
+      result[x][y] = value
+    end
+  end
+
+  return result
+end
+
 return {
   accumulate = accumulate,
   all = all,
   any = any,
   compareDirections = compareDirections,
   digits = digits,
-  gcd = gcd,
+  greatestCommonDivisor = greatestCommonDivisor,
+  factors = factors,
+  leastCommonMultiple = leastCommonMultiple,
   maxResult = maxResult,
   minResult = minResult,
+  primes = primes,
   squaredLength = squaredLength,
   squaredDistance = squaredDistance,
   sum = sum,
+  transpose = transpose,
 }

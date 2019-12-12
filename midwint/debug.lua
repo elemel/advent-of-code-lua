@@ -130,7 +130,7 @@ local function formatParam(program, instructionPointer, param)
     return magenta(address)
   elseif mode == 2 then
     local value = program[program.relativeBase + address] or "?"
-    return blue(program.relativeBase .. "+" .. address) .. ":" .. magenta(value)
+    return cyan("rb") .. blue(string.format("%+d", address)) .. ":" .. magenta(value)
   else
     return "?"
   end
@@ -297,10 +297,30 @@ local function write(program, value)
   print("Input queue: " .. formatQueue(program.inputQueue))
 end
 
+local function scan(program)
+  local j
+
+  for i = 0, #program do
+    if program[i] == 109 then
+      if (program[i + 1] or 0) > 0 then
+        j = i
+      else
+        if j and (program[i + 1]  or 0) == -program[j + 1] and program[i + 2] == 2105 and program[i + 3] == 1 and program[i + 4] == 0 then
+          print("Function at " .. j .. "-" .. i + 2)
+          program.labels[j] = "func" .. j
+        else
+          j = nil
+        end
+      end
+    end
+  end
+end
+
 return {
   list = list,
   read = read,
   run = run,
+  scan = scan,
   status = status,
   step = step,
   write = write,

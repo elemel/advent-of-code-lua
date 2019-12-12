@@ -1,7 +1,7 @@
 local yulea = require("yulea")
 
 local enumerate = yulea.enumerate
-local gcd = yulea.gcd
+local greatestCommonDivisor = yulea.greatestCommonDivisor
 local split = yulea.split
 
 local asteroids = {}
@@ -29,7 +29,7 @@ for y1, row1 in pairs(asteroids) do
           local dx = x2 - x1
           local dy = y2 - y1
 
-          local d = gcd(dx, dy)
+          local d = greatestCommonDivisor(dx, dy)
 
           dx = dx / d
           dy = dy / d
