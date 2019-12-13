@@ -3,10 +3,11 @@ local midwint = require("midwint")
 local function printScreen(screen)
   local tiles = {"#", "%", "=", "O"}
 
-  for y, row in ipairs(screen) do
+  for y = 0, #screen do
     local line = {}
 
-    for x, tile in pairs(row) do
+    for x = 0, #screen[y] do
+      local tile = screen[y][x]
       line[#line + 1] = tiles[tile] or " "
     end
 
@@ -19,7 +20,7 @@ program[0] = 2
 
 local input = 0
 local screen = {}
-local score
+local score = 0
 
 repeat
   program.inputQueue:push(input)

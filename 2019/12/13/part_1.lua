@@ -2,6 +2,7 @@ local midwint = require("midwint")
 
 local program = midwint.Program.new(io.read())
 program:run()
+
 local screen = {}
 
 while not program.outputQueue:isEmpty() do
