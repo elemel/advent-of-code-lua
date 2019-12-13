@@ -39,20 +39,20 @@ local function leftAlign(s, w)
   local n = ansiLen(s)
 
   if n >= w then
-    return s
+    return s, n
   end
 
-  return s .. string.rep(" ", w - n)
+  return s .. string.rep(" ", w - n), w
 end
 
 local function rightAlign(s, w)
   local n = ansiLen(s)
 
   if n >= w then
-    return s
+    return s, n
   end
 
-  return string.rep(" ", w - n) .. s
+  return string.rep(" ", w - n) .. s, w
 end
 
 local function blue(s)
@@ -79,11 +79,43 @@ local function yellow(s)
   return ansicolors("%{yellow}" .. s)
 end
 
-local function readParam(program, instructionPointer, param)
+local function formatColumns(columns, columnWidth)
+  columnWidth = columnWidth or 16
+
+  local buffer = {}
+  local totalWidth = 0
+  local targetWidth = 0
+
+  for i, column in ipairs(columns) do
+    local width = ansiLen(column)
+
+    if i == 1 then
+      targetWidth = columnWidth
+      paddingWidth = math.max(0, targetWidth - width)
+      totalWidth = paddingWidth + width
+
+      table.insert(buffer, string.rep(" ", paddingWidth))
+      table.insert(buffer, column)
+    else
+      targetWidth = targetWidth + 2 + columnWidth
+      paddingWidth = math.max(0, targetWidth - totalWidth - width - 2)
+      totalWidth = totalWidth + 2 + paddingWidth + width
+
+      table.insert(buffer, " ")
+      table.insert(buffer, string.rep(".", paddingWidth))
+      table.insert(buffer, " ")
+      table.insert(buffer, column)
+    end
+  end
+
+  return table.concat(buffer)
+end
+
+local function readParameter(program, instructionPointer, parameter)
   local opcode = program[instructionPointer] or 0
-  local divisor = 10 ^ (param + 1)
+  local divisor = 10 ^ (parameter + 1)
   local mode = math.floor(opcode / divisor) % 10
-  local address = program[instructionPointer + param] or 0
+  local address = program[instructionPointer + parameter] or 0
 
   if mode == 0 then
     return program[address] or 0
@@ -96,11 +128,11 @@ local function readParam(program, instructionPointer, param)
   end
 end
 
-local function formatParam(program, instructionPointer, param)
+local function formatParameter(program, instructionPointer, parameter)
   local opcodeModes = program[instructionPointer] or 0
-  local divisor = 10 ^ (param + 1)
+  local divisor = 10 ^ (parameter + 1)
   local mode = math.floor(opcodeModes / divisor) % 10
-  local address = program[instructionPointer + param]
+  local address = program[instructionPointer + parameter]
   local opcode = opcodeModes % 100
 
   if address == nil then
@@ -117,7 +149,7 @@ local function formatParam(program, instructionPointer, param)
 
     return blue(address) .. ":" .. magenta(value)
   elseif mode == 1 then
-    if (opcode == 5 or opcode == 6) and param == 2 then
+    if (opcode == 5 or opcode == 6) and parameter == 2 then
       local label = program.labels[address]
 
       if label then
@@ -174,7 +206,7 @@ local function printInstruction(program, instructionPointer)
         name = yellow(name)
       end
     elseif name == "jif" then
-      local value = readParam(program, instructionPointer, 1)
+      local value = readParameter(program, instructionPointer, 1)
 
       if value == 0 then
         name = green(name)
@@ -182,7 +214,7 @@ local function printInstruction(program, instructionPointer)
         name = yellow(name)
       end
     elseif name == "jit" then
-      local value = readParam(program, instructionPointer, 1)
+      local value = readParameter(program, instructionPointer, 1)
 
       if value ~= 0 then
         name = green(name)
@@ -197,22 +229,20 @@ local function printInstruction(program, instructionPointer)
   end
 
   local size = instructionSizes[opcode] or 1
-  local params = {}
+  local parameters = {}
 
   if program.breakpoints[instructionPointer] then
     label = yellow("*") .. label
   end
 
+  columns = {}
+  table.insert(columns, label .. ":" .. leftAlign(name, 2))
+
   for j = 1, size - 1 do
-    params[j] = rightAlign(formatParam(program, instructionPointer, j), 16)
+    table.insert(columns, formatParameter(program, instructionPointer, j))
   end
 
-  print(string.format(
-    "%s:%s  %s",
-    rightAlign(label, 12),
-    leftAlign(name, 3),
-    table.concat(params, "  ")))
-
+  print(formatColumns(columns, 16))
   return size
 end
 
@@ -273,7 +303,7 @@ local function list(program, n)
     end
 
     if program.data[instructionPointer] then
-      print(i .. ":" .. program[i])
+      print(instructionPointer .. ":" .. program[instructionPointer])
       instructionPointer = instructionPointer + 1
     else
       local size = printInstruction(program, instructionPointer)
@@ -289,13 +319,13 @@ local function list(program, n)
   end
 
   for i = 1, math.ceil(#watches / 4) do
-    local row = {}
+    local columns = {}
 
     for j = i * 4 - 3, math.min(i * 4, #watches) do
-      table.insert(row, rightAlign(watches[j], 16))
+      table.insert(columns, watches[j])
     end
 
-    print(table.concat(row, "  "))
+    print(formatColumns(columns, 16))
   end
 end
 
@@ -377,6 +407,12 @@ local function scan(program)
           if (func and
             (program[i + 1]  or 0) == -program[func + 1] and
             program[i + 2] == 2105 and program[i + 3] == 1 and
+            program[i + 4] == 0) then
+
+            functions[func] = i + 2
+          elseif (func and
+            (program[i + 1]  or 0) == -program[func + 1] and
+            program[i + 2] == 2106 and program[i + 3] == 0 and
             program[i + 4] == 0) then
 
             functions[func] = i + 2

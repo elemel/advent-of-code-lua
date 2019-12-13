@@ -37,6 +37,10 @@ end
 function day13()
   local program = day(13)
 
+  for i = 379, 392 do
+    program.data[i] = true
+  end
+
   for i = 639, #program do
     program.data[i] = true
   end
