@@ -136,14 +136,18 @@ local function formatParam(program, instructionPointer, param)
   end
 end
 
-local function formatQueue(queue)
+local function queueElements(queue)
   local t = {}
 
   for i = queue.first, queue.last do
     t[#t + 1] = queue[i]
   end
 
-  return table.concat(t, ", ")
+  return t
+end
+
+local function formatQueue(queue)
+  return table.concat(queueElements(queue), ", ")
 end
 
 local function printInstruction(program, instructionPointer)
@@ -212,6 +216,39 @@ local function printInstruction(program, instructionPointer)
   return size
 end
 
+local function formatWatchQueue(queue)
+  local elements = queueElements(queue)
+
+  if #elements == 0 then
+    return magenta("empty")
+  end
+
+  local t = {}
+
+  for i, element in ipairs(elements) do
+    t[i] = magenta(element)
+  end
+
+  return table.concat(t, ",")
+end
+
+local function formatWatch(watch, program)
+  if watch == "ip" then
+    local value = program.instructionPointer or "?"
+    return cyan("ip") .. "=" .. magenta(value)
+  elseif watch == "rb" then
+    local value = program.relativeBase or "?"
+    return cyan("rb") .. "=" .. magenta(value)
+  elseif watch == "iq" then
+    return cyan("iq") .. "=" .. formatWatchQueue(program.inputQueue)
+  elseif watch == "oq" then
+    return cyan("oq") .. "=" .. formatWatchQueue(program.outputQueue)
+  else
+    local value = program[watch] or "?"
+    return blue(watch) .. ":" .. magenta(value)
+  end
+end
+
 local function list(program, n)
   n = n or 10
 
@@ -242,6 +279,23 @@ local function list(program, n)
 
     local size = printInstruction(program, instructionPointer)
     instructionPointer = instructionPointer + size
+  end
+
+  print("Watches:")
+  local watches = {}
+
+  for i, watch in ipairs(program.watches) do
+    table.insert(watches, formatWatch(watch, program))
+  end
+
+  for i = 1, math.ceil(#watches / 4) do
+    local row = {}
+
+    for j = i * 4 - 3, math.min(i * 4, #watches) do
+      table.insert(row, rightAlign(watches[j], 16))
+    end
+
+    print(table.concat(row, "  "))
   end
 end
 

@@ -145,6 +145,7 @@ function Program.new(source)
 
   program.labels = {}
   program.breakpoints = {}
+  program.watches = {"ip", "rb", "iq", "oq"}
 
   return setmetatable(program, Program)
 end
