@@ -33,3 +33,14 @@ end
 function day11()
   return day(11)
 end
+
+function day13()
+  local program = day(13)
+
+  for i = 639, #program do
+    program.data[i] = true
+  end
+
+  scan(program)
+  return program
+end

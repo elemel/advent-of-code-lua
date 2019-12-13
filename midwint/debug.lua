@@ -117,7 +117,7 @@ local function formatParam(program, instructionPointer, param)
 
     return blue(address) .. ":" .. magenta(value)
   elseif mode == 1 then
-    if opcode == 5 or opcode == 6 then
+    if (opcode == 5 or opcode == 6) and param == 2 then
       local label = program.labels[address]
 
       if label then
@@ -218,18 +218,13 @@ end
 
 local function formatWatchQueue(queue)
   local elements = queueElements(queue)
-
-  if #elements == 0 then
-    return magenta("empty")
-  end
-
   local t = {}
 
   for i, element in ipairs(elements) do
     t[i] = magenta(element)
   end
 
-  return table.concat(t, ",")
+  return "{" .. table.concat(t, ",") .. "}"
 end
 
 local function formatWatch(watch, program)
@@ -277,8 +272,13 @@ local function list(program, n)
       break
     end
 
-    local size = printInstruction(program, instructionPointer)
-    instructionPointer = instructionPointer + size
+    if program.data[instructionPointer] then
+      print(i .. ":" .. program[i])
+      instructionPointer = instructionPointer + 1
+    else
+      local size = printInstruction(program, instructionPointer)
+      instructionPointer = instructionPointer + size
+    end
   end
 
   print("Watches:")
@@ -352,19 +352,99 @@ local function write(program, value)
 end
 
 local function scan(program)
-  local j
+  local instructions = {}
+  local parameters = {}
+  local reads = {}
+  local writes = {}
+  local targets = {}
+  local functions = {}
+
+  local func
 
   for i = 0, #program do
-    if program[i] == 109 then
-      if (program[i + 1] or 0) > 0 then
-        j = i
-      else
-        if j and (program[i + 1]  or 0) == -program[j + 1] and program[i + 2] == 2105 and program[i + 3] == 1 and program[i + 4] == 0 then
-          print("Function at " .. j .. "-" .. i + 2)
-          program.labels[j] = "func" .. j
+    if not program.data[i] and not parameters[i] then
+      local opcodeModes = program[i]
+      local opcode = opcodeModes % 100
+
+      local mode1 = math.floor(opcodeModes / 100) % 10
+      local mode2 = math.floor(opcodeModes / 1000) % 10
+      local mode3 = math.floor(opcodeModes / 10000) % 10
+
+      if opcode == 9 and mode1 == 1 then
+        if (program[i + 1] or 0) > 0 then
+          func = i
         else
-          j = nil
+          if (func and
+            (program[i + 1]  or 0) == -program[func + 1] and
+            program[i + 2] == 2105 and program[i + 3] == 1 and
+            program[i + 4] == 0) then
+
+            functions[func] = i + 2
+          else
+            func = nil
+          end
         end
+      end
+
+      if instructionSizes[opcode] then
+        instructions[i] = true
+
+        for j = 1, instructionSizes[opcode] - 1 do
+          parameters[i + j] = true
+        end
+      end
+
+      if ((opcode == 1 or opcode == 2 or opcode == 4 or opcode == 5 or
+        opcode == 6 or opcode == 7 or opcode == 8 or opcode == 9) and
+        mode1 == 0) then
+
+        local var = program[i + 1] or 0
+        reads[var] = true
+      end
+
+      if ((opcode == 1 or opcode == 2 or opcode == 7 or opcode == 8) and
+        mode2 == 0)
+      then
+
+        local var = program[i + 2] or 0
+        reads[var] = true
+      end
+
+      if ((opcode == 1 or opcode == 2 or opcode == 7 or opcode == 8) and
+        mode3 == 0) then
+
+        local var = program[i + 3] or 0
+        writes[var] = true
+      end
+
+      if opcode == 3 and mode1 == 0 then
+        local var = program[i + 1] or 0
+        writes[var] = true
+      end
+
+      if (opcode == 5 or opcode == 6) and mode2 == 1 then
+        local target = program[i + 2] or 0
+        targets[target] = true
+      end
+    end
+  end
+
+  for i = 0, #program do
+    if not program.labels[i] then
+      if functions[i] then
+        program.labels[i] = "f" .. i
+      elseif targets[i] then
+        program.labels[i] = "t" .. i
+      -- elseif instructions[i] then
+        -- program.labels[i] = "i" .. i
+      elseif writes[i] then
+        program.labels[i] = "w" .. i
+      elseif reads[i] then
+        program.labels[i] = "r" .. i
+      end
+
+      if program.labels[i] then
+        print(program.labels[i])
       end
     end
   end

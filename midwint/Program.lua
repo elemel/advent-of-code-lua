@@ -143,8 +143,9 @@ function Program.new(source)
   program.inputQueue = Queue.new()
   program.outputQueue = Queue.new()
 
-  program.labels = {}
   program.breakpoints = {}
+  program.data = {}
+  program.labels = {}
   program.watches = {"ip", "rb", "iq", "oq"}
 
   return setmetatable(program, Program)
