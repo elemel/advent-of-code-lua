@@ -1,9 +1,9 @@
 local testUtils = require("yulea.test.testUtils")
 local yulea = require("yulea")
 
-local array = yulea.table.array
 local compare = yulea.table.compare
 local deepEquals = testUtils.deepEquals
+local toArray = yulea.table.toArray
 
 local tableTest = {}
 
@@ -14,7 +14,7 @@ function tableTest.testArray()
     coroutine.yield(3)
   end)
 
-  assert(deepEquals(array(iterator), {1, 2, 3}))
+  assert(deepEquals(toArray(iterator), {1, 2, 3}))
 end
 
 function tableTest.testCompare()

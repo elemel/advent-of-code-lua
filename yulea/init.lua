@@ -15,7 +15,6 @@ return {
 
   all = yuleaMath.all,
   any = yuleaMath.any,
-  array = yuleaTable.array,
   compareDirections = yuleaMath.compareDirections,
   count = yuleaIterator.count,
   cycle = yuleaIterator.cycle,
@@ -41,6 +40,7 @@ return {
   squaredLength = yuleaMath.squaredLength,
   stream = yuleaIterator.stream,
   sum = yuleaMath.sum,
+  toArray = yuleaTable.toArray,
   toTuple = yuleaIterator.toTuple,
   transpose = yuleaMath.transpose,
 }

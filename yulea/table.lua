@@ -1,22 +1,3 @@
-local function array(iterator, result, first, last, step)
-  result = result or {}
-  first = first or 1
-  last = last or math.huge
-  step = step or 1
-
-  for i = first, last, step do
-    local element = iterator()
-
-    if element == nil then
-      break
-    end
-
-    result[i] = element
-  end
-
-  return result
-end
-
 local function compare(t1, t2, compareElement)
   compareElement = compareElement or function(v1, v2) return v1 < v2 end
 
@@ -149,6 +130,25 @@ local function reverse(t)
   end
 end
 
+local function toArray(iterator, result, first, last, step)
+  result = result or {}
+  first = first or 1
+  last = last or math.huge
+  step = step or 1
+
+  for i = first, last, step do
+    local element = iterator()
+
+    if element == nil then
+      break
+    end
+
+    result[i] = element
+  end
+
+  return result
+end
+
 local function values(t)
   local k, v
 
@@ -159,7 +159,6 @@ local function values(t)
 end
 
 return {
-  array = array,
   compare = compare,
   copy = copy,
   elements = elements,
@@ -171,5 +170,6 @@ return {
   memoize = memoize,
   permutations = permutations,
   reverse = reverse,
+  toArray = toArray,
   values = values,
 }

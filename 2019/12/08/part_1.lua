@@ -1,10 +1,10 @@
 local yulea = require("yulea")
 
-local array = yulea.array
 local elements = yulea.elements
 local map = yulea.map
 local reduce = yulea.reduce
 local split = yulea.split
+local toArray = yulea.toArray
 
 local function countDigits(layer, digit)
   local result = 0
@@ -22,7 +22,7 @@ end
 
 local width = 25
 local height = 6
-local pixels = array(map(split(io.read()), tonumber))
+local pixels = toArray(map(split(io.read()), tonumber))
 
 local layerCount = math.floor(#pixels / (width * height))
 local image = {}
