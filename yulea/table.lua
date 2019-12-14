@@ -130,6 +130,20 @@ local function reverse(t)
   end
 end
 
+local function tableOf(...)
+  local n = select("#", ...)
+  assert(n % 2 == 0, "Odd argument count")
+
+  local args = {...}
+  local result = {}
+
+  for i = 1, n, 2 do
+    result[args[i]] = args[i + 1]
+  end
+
+  return result
+end
+
 local function toArray(iterator, result, first, last, step)
   result = result or {}
   first = first or 1
@@ -170,6 +184,7 @@ return {
   memoize = memoize,
   permutations = permutations,
   reverse = reverse,
+  tableOf = tableOf,
   toArray = toArray,
   values = values,
 }

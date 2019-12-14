@@ -40,6 +40,7 @@ return {
   squaredLength = yuleaMath.squaredLength,
   stream = yuleaIterator.stream,
   sum = yuleaMath.sum,
+  tableOf = yuleaTable.tableOf,
   toArray = yuleaTable.toArray,
   toTuple = yuleaIterator.toTuple,
   transpose = yuleaMath.transpose,
