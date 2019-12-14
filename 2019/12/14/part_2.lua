@@ -2,53 +2,57 @@ local deque = require("deque")
 local yulea = require("yulea")
 
 local array = yulea.array
-local elements = yulea.elements
-local map = yulea.map
 local split = yulea.split
 
-local function parseChemical(s)
-  local quantity, name = table.unpack(array(split(s, " ")))
-  return {tonumber(quantity), name}
+local function parseQuantityChemical(s)
+  local quantity, chemical = table.unpack(array(split(s, " ")))
+  return tonumber(quantity), chemical
 end
 
 local function parseReaction(line)
-  local input, output = table.unpack(array(split(line, " => ")))
-  local inputs = array(map(split(input, ", "), parseChemical))
-  return inputs, parseChemical(output)
+  local inputsStr, outputStr = table.unpack(array(split(line, " => ")))
+  local outputQuantity, outputChemical = parseQuantityChemical(outputStr)
+  local inputs = {}
+
+  for inputStr in split(inputsStr, ", ") do
+    local inputQuantity, inputChemical = parseQuantityChemical(inputStr)
+    inputs[inputChemical] = inputQuantity
+  end
+
+  return outputChemical, outputQuantity, inputs
 end
 
 local function oreDemand(fuelDemand, reactions)
   local supplies = {}
   local demands = {FUEL = fuelDemand}
 
-  local queue = deque.new()
-  queue:push_right("FUEL")
+  local demandQueue = deque.new()
+  demandQueue:push_right("FUEL")
 
   repeat
-    local chemical = queue:pop_left()
-    local quantity = demands[chemical] or 0
-    demands[chemical] = 0
+    local demandChemical = demandQueue:pop_left()
+    local demandQuantity = demands[demandChemical] or 0
+    demands[demandChemical] = 0
 
-    if quantity <= (supplies[chemical] or 0) then
-      supplies[chemical] = (supplies[chemical] or 0) - quantity
+    if demandQuantity <= (supplies[demandChemical] or 0) then
+      supplies[demandChemical] =
+        (supplies[demandChemical] or 0) - demandQuantity
     else
-      quantity = quantity - (supplies[chemical] or 0)
-      local outputQuantity, inputs = table.unpack(reactions[chemical])
-      local count = math.ceil(quantity / outputQuantity)
-      supplies[chemical] = count * outputQuantity - quantity
+      demandQuantity = demandQuantity - (supplies[demandChemical] or 0)
+      local outputQuantity, inputs = table.unpack(reactions[demandChemical])
+      local reactionCount = math.ceil(demandQuantity / outputQuantity)
+      supplies[demandChemical] = reactionCount * outputQuantity - demandQuantity
 
-      for input in elements(inputs) do
-        local inputQuantity, inputChemical = table.unpack(input)
-
+      for inputChemical, inputQuantity in pairs(inputs) do
         demands[inputChemical] =
-          (demands[inputChemical] or 0) + count * inputQuantity
+          (demands[inputChemical] or 0) + reactionCount * inputQuantity
 
         if inputChemical ~= "ORE" then
-          queue:push_right(inputChemical)
+          demandQueue:push_right(inputChemical)
         end
       end
     end
-  until queue:is_empty()
+  until demandQueue:is_empty()
 
   return demands.ORE
 end
@@ -56,9 +60,8 @@ end
 local reactions = {}
 
 for line in io.lines() do
-  local inputs, output = parseReaction(line)
-  local quantity, chemical = table.unpack(output)
-  reactions[chemical] = {quantity, inputs}
+  local outputChemical, outputQuantity, inputs = parseReaction(line)
+  reactions[outputChemical] = {outputQuantity, inputs}
 end
 
 local oreSupply = 1000000000000
