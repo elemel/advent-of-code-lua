@@ -130,6 +130,16 @@ local function reverse(t)
   end
 end
 
+local function setOf(...)
+  local result = {}
+
+  for i, v in ipairs({...}) do
+    result[v] = true
+  end
+
+  return result
+end
+
 local function tableOf(...)
   local n = select("#", ...)
   assert(n % 2 == 0, "Odd argument count")
@@ -184,6 +194,7 @@ return {
   memoize = memoize,
   permutations = permutations,
   reverse = reverse,
+  setOf = setOf,
   tableOf = tableOf,
   toArray = toArray,
   values = values,

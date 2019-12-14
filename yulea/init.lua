@@ -35,6 +35,7 @@ return {
   permutations = yuleaTable.permutations,
   range = yuleaIterator.range,
   reduce = yuleaIterator.reduce,
+  setOf = yuleaTable.setOf,
   split = yuleaString.split,
   squaredDistance = yuleaMath.squaredDistance,
   squaredLength = yuleaMath.squaredLength,
