@@ -1,16 +1,16 @@
 local deque = require("deque")
 local yulea = require("yulea")
 
-local array = yulea.array
 local split = yulea.split
+local toTuple = yulea.toTuple
 
 local function parseQuantityChemical(s)
-  local quantity, chemical = table.unpack(array(split(s, " ")))
+  local quantity, chemical = toTuple(split(s, " "))
   return tonumber(quantity), chemical
 end
 
 local function parseReaction(line)
-  local inputsStr, outputStr = table.unpack(array(split(line, " => ")))
+  local inputsStr, outputStr = toTuple(split(line, " => "))
   local outputQuantity, outputChemical = parseQuantityChemical(outputStr)
   local inputs = {}
 

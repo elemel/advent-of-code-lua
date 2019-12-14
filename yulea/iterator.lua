@@ -164,6 +164,16 @@ local function take(iterator, n)
   end)
 end
 
+local function toTuple(iterator)
+  local t = {}
+
+  for element in iterator do
+    t[#t + 1] = element
+  end
+
+  return table.unpack(t)
+end
+
 return {
   count = count,
   cycle = cycle,
@@ -179,4 +189,5 @@ return {
   rep = rep,
   stream = stream,
   take = take,
+  toTuple = toTuple,
 }

@@ -41,5 +41,6 @@ return {
   squaredLength = yuleaMath.squaredLength,
   stream = yuleaIterator.stream,
   sum = yuleaMath.sum,
+  toTuple = yuleaIterator.toTuple,
   transpose = yuleaMath.transpose,
 }
