@@ -173,6 +173,26 @@ local function toArray(iterator, result, first, last, step)
   return result
 end
 
+local function toSet(iterator, result)
+  result = result or {}
+
+  for element in iterator do
+    result[element] = true
+  end
+
+  return result
+end
+
+local function toTable(iterator, result)
+  result = result or {}
+
+  for k, v in iterator do
+    result[k] = v
+  end
+
+  return result
+end
+
 local function values(t)
   local k, v
 
@@ -197,5 +217,7 @@ return {
   setOf = setOf,
   tableOf = tableOf,
   toArray = toArray,
+  toSet = toSet,
+  toTable = toTable,
   values = values,
 }

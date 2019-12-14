@@ -43,6 +43,8 @@ return {
   sum = yuleaMath.sum,
   tableOf = yuleaTable.tableOf,
   toArray = yuleaTable.toArray,
+  toSet = yuleaTable.toSet,
+  toTable = yuleaTable.toTable,
   toTuple = yuleaIterator.toTuple,
   transpose = yuleaMath.transpose,
 }
