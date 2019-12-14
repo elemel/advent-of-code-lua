@@ -1,7 +1,13 @@
 local deque = require("deque")
 local yulea = require("yulea")
 
+local elements = yulea.elements
+local keys = yulea.keys
+local reverse = yulea.reverse
 local split = yulea.split
+local toArray = yulea.toArray
+local topologicalSort = yulea.topologicalSort
+local toSet = yulea.toSet
 local toTuple = yulea.toTuple
 
 local function parseQuantityChemical(s)
@@ -22,54 +28,49 @@ local function parseReaction(line)
   return outputChemical, outputQuantity, inputs
 end
 
-local function oreDemand(fuelDemand, reactions)
-  local supplies = {}
-  local demands = {FUEL = fuelDemand}
+local function ore(fuel, reactions, sortedChemicals)
+  local balances = {FUEL = -fuel}
 
-  local demandQueue = deque.new()
-  demandQueue:push_right("FUEL")
+  for chemical in elements(sortedChemicals) do
+    local quantity = balances[chemical] or 0
 
-  repeat
-    local demandChemical = demandQueue:pop_left()
-    local demandQuantity = demands[demandChemical] or 0
-    demands[demandChemical] = 0
-
-    if demandQuantity <= (supplies[demandChemical] or 0) then
-      supplies[demandChemical] =
-        (supplies[demandChemical] or 0) - demandQuantity
-    else
-      demandQuantity = demandQuantity - (supplies[demandChemical] or 0)
-      local outputQuantity, inputs = table.unpack(reactions[demandChemical])
-      local reactionCount = math.ceil(demandQuantity / outputQuantity)
-      supplies[demandChemical] = reactionCount * outputQuantity - demandQuantity
+    if quantity < 0 then
+      local outputQuantity, inputs = table.unpack(reactions[chemical])
+      local reactionCount = math.ceil(-quantity / outputQuantity)
+      balances[chemical] = balances[chemical] + reactionCount * outputQuantity
 
       for inputChemical, inputQuantity in pairs(inputs) do
-        demands[inputChemical] =
-          (demands[inputChemical] or 0) + reactionCount * inputQuantity
-
-        if inputChemical ~= "ORE" then
-          demandQueue:push_right(inputChemical)
-        end
+        balances[inputChemical] =
+          (balances[inputChemical] or 0) - reactionCount * inputQuantity
       end
     end
-  until demandQueue:is_empty()
+  end
 
-  return demands.ORE
+  return -balances.ORE
 end
 
 local reactions = {}
+local dependencies = {}
 
 for line in io.lines() do
   local outputChemical, outputQuantity, inputs = parseReaction(line)
   reactions[outputChemical] = {outputQuantity, inputs}
+  dependencies[outputChemical] = {}
+
+  for inputChemical in pairs(inputs) do
+    dependencies[outputChemical][inputChemical] = true
+  end
 end
 
-local oreSupply = 1000000000000
+local sortedChemicals = topologicalSort(dependencies)
+reverse(sortedChemicals)
+
+local oreCargo = 1000000000000
 
 local minFuel = 0
 local maxFuel = 1
 
-while oreDemand(maxFuel, reactions) < oreSupply do
+while ore(maxFuel, reactions, sortedChemicals) < oreCargo do
   minFuel = maxFuel
   maxFuel = 2 * maxFuel
 end
@@ -77,7 +78,7 @@ end
 while maxFuel - minFuel > 2 do
   local middleFuel = math.floor((minFuel + maxFuel) / 2)
 
-  if oreDemand(middleFuel, reactions) < oreSupply then
+  if ore(middleFuel, reactions, sortedChemicals) < oreCargo then
     minFuel = middleFuel
   else
     maxFuel = middleFuel

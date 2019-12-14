@@ -173,6 +173,28 @@ local function toArray(iterator, result, first, last, step)
   return result
 end
 
+local function topologicalSort(dependencies, result)
+  result = result or {}
+
+  while next(dependencies) do
+    for target, sources in pairs(dependencies) do
+      for source in pairs(sources) do
+        if not dependencies[source] then
+          sources[source] = nil
+          break
+        end
+      end
+
+      if not next(sources) then
+        dependencies[target] = nil
+        result[#result + 1] = target
+      end
+    end
+  end
+
+  return result
+end
+
 local function toSet(iterator, result)
   result = result or {}
 
@@ -217,6 +239,7 @@ return {
   setOf = setOf,
   tableOf = tableOf,
   toArray = toArray,
+  topologicalSort = topologicalSort,
   toSet = toSet,
   toTable = toTable,
   values = values,
