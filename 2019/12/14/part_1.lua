@@ -36,26 +36,22 @@ repeat
   local quantity = demands[chemical] or 0
   demands[chemical] = 0
 
-  if quantity >= 1 then
-    print(quantity, chemical)
-
+  if quantity <= (supplies[chemical] or 0) then
+    supplies[chemical] = (supplies[chemical] or 0) - quantity
+  else
+    quantity = quantity - (supplies[chemical] or 0)
     local outputQuantity, inputs = table.unpack(reactions[chemical])
     local count = math.ceil(quantity / outputQuantity)
-    supplies[chemical] = (supplies[chemical] or 0) + count * outputQuantity - quantity
+    supplies[chemical] = count * outputQuantity - quantity
 
     for input in elements(inputs) do
       local inputQuantity, inputChemical = table.unpack(input)
-      local supplyQuantity = supplies[inputChemical] or 0
 
-      if count * inputQuantity <= (supplies[inputChemical] or 0) then
-        supplies[inputChemical] = (supplies[inputChemical] or 0) - count * inputQuantity
-      else
-        supplies[inputChemical] = 0
-        demands[inputChemical] = (demands[inputChemical] or 0) + count * inputQuantity - (supplies[inputChemical] or 0)
+      demands[inputChemical] =
+        (demands[inputChemical] or 0) + count * inputQuantity
 
-        if inputChemical ~= "ORE" then
-          queue:push_right(inputChemical)
-        end
+      if inputChemical ~= "ORE" then
+        queue:push_right(inputChemical)
       end
     end
   end
