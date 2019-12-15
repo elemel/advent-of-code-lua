@@ -186,4 +186,26 @@ function Program:isHalted()
   return self.instructionPointer == nil
 end
 
+function Program:clone()
+  local program = {}
+  local address = 0
+
+  for address = 0, #self do
+    program[address] = self[address]
+  end
+
+  program.instructionPointer = self.instructionPointer
+  program.relativeBase = self.relativeBase
+
+  program.inputQueue = Queue.new()
+  program.outputQueue = Queue.new()
+
+  program.breakpoints = {}
+  program.data = {}
+  program.labels = {}
+  program.watches = {"ip", "rb", "iq", "oq"}
+
+  return setmetatable(program, Program)
+end
+
 return Program
