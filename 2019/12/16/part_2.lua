@@ -10,15 +10,20 @@ local toArray = yulea.toArray
 local line = io.read()
 
 local offset = tonumber(string.sub(line, 1, 7))
-local input = toArray(cycle(map(split(line), tonumber), 10000))
+local input = toArray(map(split(line), tonumber))
+local signal = {}
+
+for i = offset + 1, 10000 * #input do
+  signal[#signal + 1] = input[(i - 1) % #input + 1]
+end
 
 for phase = 1, 100 do
   local total = 0
 
-  for i = #input, offset, -1 do
-    total = (total + input[i]) % 10
-    input[i] = total
+  for i = #signal, 1, -1 do
+    total = (total + signal[i]) % 10
+    signal[i] = total
   end
 end
 
-print(join(slice(input, offset + 1, offset + 8)))
+print(join(slice(signal, 1, 8)))
