@@ -229,6 +229,32 @@ local function transpose(matrix)
   return result
 end
 
+local function multiplySparse(left, right)
+  right = transpose(right)
+  local result = {}
+
+  for x, column in pairs(transpose(right)) do
+    for y, row in pairs(left) do
+      local resultValue = 0
+
+      for i, rowValue in pairs(row) do
+        local columnValue = column[i]
+
+        if rightValue then
+          resultValue = resultValue + rowValue * columnValue
+        end
+      end
+
+      if total ~= 0 then
+        result[y] = result[y] or {}
+        result[y][x] = resultValue
+      end
+    end
+  end
+
+  return result
+end
+
 return {
   accumulate = accumulate,
   all = all,

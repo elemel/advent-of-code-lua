@@ -140,6 +140,18 @@ local function setOf(...)
   return result
 end
 
+local function slice(t, first, last, step)
+  first = first or 1
+  last = last or math.huge
+  step = step or 1
+
+  return coroutine.wrap(function()
+    for i = first, last, step do
+      coroutine.yield(t[i])
+    end
+  end)
+end
+
 local function tableOf(...)
   local n = select("#", ...)
   assert(n % 2 == 0, "Odd argument count")
@@ -237,6 +249,7 @@ return {
   permutations = permutations,
   reverse = reverse,
   setOf = setOf,
+  slice = slice,
   tableOf = tableOf,
   toArray = toArray,
   topologicalSort = topologicalSort,

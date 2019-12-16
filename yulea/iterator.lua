@@ -10,7 +10,9 @@ local function count(iterator)
   return result
 end
 
-local function cycle(iterator)
+local function cycle(iterator, n)
+  n = n or math.huge
+
   return coroutine.wrap(function()
     local elements = {}
 
@@ -19,7 +21,7 @@ local function cycle(iterator)
       table.insert(elements, element)
     end
 
-    while true do
+    for _ = 2, n do
       for _, element in ipairs(elements) do
         coroutine.yield(element)
       end

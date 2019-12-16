@@ -1,51 +1,72 @@
 local deque = require("deque")
 local midwint = require("midwint")
+local yulea = require("yulea")
+
+local breadthFirstSearch = yulea.breadthFirstSearch
+local depth = yulea.depth
+local getCell = yulea.getCell
+local printGrid = yulea.printGrid
+local setCell = yulea.setCell
+
+local function key(x, y)
+  return string.format("%d,%d", x, y)
+end
 
 local commands = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}}
+local backtrackInstructions = {2, 1, 4, 3}
+
 local program = midwint.Program.new(io.read())
 
 local queue = deque.new()
 queue:push_right({0, 0, 0, program})
 
-local map = {}
-map[0] = {}
-map[0][0] = "."
+local grid = {}
+setCell(grid, 0, 0, ".")
 
-local visited = {}
+local oxygenSystemX, oxygenSystemY
+local graph = {}
 
-while not queue:is_empty() do
-  local step, x, y, program1 = table.unpack(queue:pop_left())
+local function search(x, y)
+  for instruction, direction in ipairs(commands) do
+    local dx, dy = table.unpack(direction)
+    local char = grid[y + dy] and grid[y + dy][x + dx]
 
-  if not visited[y] or not visited[y][x] then
-    visited[y] = visited[y] or {}
-    visited[y][x] = true
+    if not char then
+      program.inputQueue:push(instruction)
+      program:run()
+      local status = program.outputQueue:pop()
 
-    for instruction, direction in ipairs(commands) do
-      local dx, dy = table.unpack(direction)
-
-      local char = map[y + dy] and map[y + dy][x + dx]
-
-      if not char then
-        program2 = program1:clone()
-        program2.inputQueue:push(instruction)
-        program2:run()
-        local status = program2.outputQueue:pop()
-
-        if status == 0 then
-          map[y + dy] = map[y + dy] or {}
-          map[y + dy][x + dx] = "#"
-        elseif status == 1 then
-          map[y + dy] = map[y + dy] or {}
-          map[y + dy][x + dx] = "."
-
-          queue:push_left({step + 1, x + dx, y + dy, program2})
-        elseif status == 2 then
-          print(step + 1)
-          return
-        else
-          error("Invalid status")
+      if status == 0 then
+        setCell(grid, x + dx, y + dy, "#")
+      elseif status == 1 or status == 2 then
+        if status == 2 then
+          oxygenSystemX = x + dx
+          oxygenSystemY = y + dy
         end
+
+        setCell(grid, x + dx, y + dy, ".")
+        search(x + dx, y + dy)
+
+        program.inputQueue:push(backtrackInstructions[instruction])
+        program:run()
+        assert(program.outputQueue:pop() ~= 0)
+      else
+        error("Invalid status")
       end
+    elseif char == "." then
+      local key1 = key(x, y)
+      local key2 = key(x + dx, y + dy)
+
+      graph[key1] = graph[key1] or {}
+      table.insert(graph[key1], key2)
+
+      graph[key2] = graph[key2] or {}
+      table.insert(graph[key2], key1)
     end
   end
 end
+
+search(0, 0)
+
+local parents = breadthFirstSearch(graph, key(0, 0))
+print(depth(parents, key(oxygenSystemX, oxygenSystemY)))
