@@ -1,6 +1,6 @@
 export LUA_PATH='?.lua;?/init.lua'
 
-LUA=luajit
+LUA=${LUA:-luajit}
 
 if [ $# -eq 0 ]
 then
