@@ -16,7 +16,7 @@ local function printScreen(screen)
 end
 
 local program = midwint.Program.new(io.read())
-program[0] = 2
+program.memory[0] = 2
 
 local input = 0
 local screen = {}

@@ -46,7 +46,7 @@ local function printVideo(program)
 end
 
 local program = midwint.Program.new(io.read())
-program[0] = 2
+program.memory[0] = 2
 writeLine(program, "A,A,B,C,B,C,B,C,C,A")
 writeLine(program, "L,10,R,8,R,8")
 writeLine(program, "L,10,L,12,R,8,R,10")

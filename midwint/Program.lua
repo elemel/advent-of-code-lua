@@ -1,32 +1,32 @@
 local Queue = require("midwint.Queue")
 
 local function read(program, param)
-  local opcode = program[program.instructionPointer] or 0
+  local opcode = program.memory[program.instructionPointer] or 0
   local divisor = 10 ^ (param + 1)
   local mode = math.floor(opcode / divisor) % 10
-  local address = program[program.instructionPointer + param] or 0
+  local address = program.memory[program.instructionPointer + param] or 0
 
   if mode == 0 then
-    return program[address] or 0
+    return program.memory[address] or 0
   elseif mode == 1 then
     return address
   elseif mode == 2 then
-    return program[program.relativeBase + address] or 0
+    return program.memory[program.relativeBase + address] or 0
   else
     error("Invalid parameter mode")
   end
 end
 
 local function write(program, param, value)
-  local opcode = program[program.instructionPointer] or 0
+  local opcode = program.memory[program.instructionPointer] or 0
   local divisor = 10 ^ (param + 1)
   local mode = math.floor(opcode / divisor) % 10
-  local address = program[program.instructionPointer + param] or 0
+  local address = program.memory[program.instructionPointer + param] or 0
 
   if mode == 0 then
-    program[address] = value
+    program.memory[address] = value
   elseif mode == 2 then
-    program[program.relativeBase + address] = value
+    program.memory[program.relativeBase + address] = value
   else
     error("Invalid parameter mode")
   end
@@ -129,11 +129,14 @@ local Program = {}
 Program.__index = Program
 
 function Program.new(source)
-  local program = {}
+  local program = {
+    memory = {},
+  }
+
   local address = 0
 
   for s in string.gmatch(source, "-?%d+") do
-    program[address] = tonumber(s)
+    program.memory[address] = tonumber(s)
     address = address + 1
   end
 
@@ -156,7 +159,7 @@ function Program:step()
     return false
   end
 
-  local opcode = self[self.instructionPointer] or 0
+  local opcode = self.memory[self.instructionPointer] or 0
   opcode = opcode % 100
 
   if opcode == 3 and self.inputQueue:isEmpty() then
@@ -178,7 +181,9 @@ function Program:run()
 end
 
 function Program:isBlocked()
-  local opcode = self.instructionPointer and self[self.instructionPointer] or 0
+  local opcode =
+    self.instructionPointer and self.memory[self.instructionPointer] or 0
+
   return opcode % 100 == 3 and self.inputQueue:isEmpty()
 end
 
@@ -187,11 +192,12 @@ function Program:isHalted()
 end
 
 function Program:clone()
-  local program = {}
-  local address = 0
+  local program = {
+    memory = {},
+  }
 
-  for address = 0, #self do
-    program[address] = self[address]
+  for address = 0, #self.memory do
+    program.memory[address] = self.memory[address]
   end
 
   program.instructionPointer = self.instructionPointer

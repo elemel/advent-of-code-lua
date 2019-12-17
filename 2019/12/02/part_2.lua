@@ -3,11 +3,11 @@ local midwint = require("midwint")
 local function run(source, noun, verb)
   local program = midwint.Program.new(source)
 
-  program[1] = noun
-  program[2] = verb
+  program.memory[1] = noun
+  program.memory[2] = verb
 
   program:run()
-  return program[0]
+  return program.memory[0]
 end
 
 local source = io.read()
