@@ -1,5 +1,7 @@
 local Stream = require("yulea.Stream")
 
+local unpack = unpack or table.unpack
+
 local function count(iterator)
   local result = 0
 
@@ -73,7 +75,7 @@ local function enumerateTuple(iterator, first, last, step)
         break
       end
 
-      coroutine.yield(i, table.unpack(elements))
+      coroutine.yield(i, unpack(elements))
     end
   end)
 end
@@ -173,7 +175,7 @@ local function toTuple(iterator)
     t[#t + 1] = element
   end
 
-  return table.unpack(t)
+  return unpack(t)
 end
 
 return {

@@ -9,6 +9,7 @@ local toArray = yulea.toArray
 local topologicalSort = yulea.topologicalSort
 local toSet = yulea.toSet
 local toTuple = yulea.toTuple
+local unpack = unpack or table.unpack
 
 local function parseQuantityChemical(s)
   local quantity, chemical = toTuple(split(s, " "))
@@ -50,7 +51,7 @@ for chemical in elements(sortedChemicals) do
   local quantity = balances[chemical] or 0
 
   if quantity < 0 then
-    local outputQuantity, inputs = table.unpack(reactions[chemical])
+    local outputQuantity, inputs = unpack(reactions[chemical])
     local reactionCount = math.ceil(-quantity / outputQuantity)
     balances[chemical] = balances[chemical] + reactionCount * outputQuantity
 

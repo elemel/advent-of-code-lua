@@ -1,3 +1,10 @@
+local ffi
+local ffiStatus, ffiResult = pcall(require, "ffi")
+
+if ffiStatus then
+  ffi = ffiResult
+end
+
 local function accumulate(iterator)
   return coroutine.wrap(function()
     local result = 0
@@ -198,6 +205,30 @@ local function leastCommonMultiple(iterator)
   return result
 end
 
+local leastCommonMultiple64
+
+if ffi then
+  leastCommonMultiple64 = function(iterator)
+    local common = {}
+
+    for i in iterator do
+      for f, n in pairs(factors(i)) do
+        common[f] = math.max(common[f] or 0, n)
+      end
+    end
+
+    local result = ffi.cast('int64_t', 1)
+
+    for f, n in pairs(common) do
+      for i = 1, n do
+        result = result * f
+      end
+    end
+
+    return result
+  end
+end
+
 local function squaredDistance(x1, y1, x2, y2)
   return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)
 end
@@ -230,7 +261,6 @@ local function transpose(matrix)
 end
 
 local function multiplySparse(left, right)
-  right = transpose(right)
   local result = {}
 
   for x, column in pairs(transpose(right)) do
@@ -240,12 +270,12 @@ local function multiplySparse(left, right)
       for i, rowValue in pairs(row) do
         local columnValue = column[i]
 
-        if rightValue then
+        if columnValue then
           resultValue = resultValue + rowValue * columnValue
         end
       end
 
-      if total ~= 0 then
+      if resultValue ~= 0 then
         result[y] = result[y] or {}
         result[y][x] = resultValue
       end
@@ -264,6 +294,7 @@ return {
   greatestCommonDivisor = greatestCommonDivisor,
   factors = factors,
   leastCommonMultiple = leastCommonMultiple,
+  leastCommonMultiple64 = leastCommonMultiple64,
   maxResult = maxResult,
   minResult = minResult,
   primes = primes,

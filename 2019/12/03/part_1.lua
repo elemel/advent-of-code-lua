@@ -1,6 +1,7 @@
 local yulea = require("yulea")
 
 local split = yulea.string.split
+local unpack = unpack or table.unpack
 
 local directions = {
   D = {0, 1},
@@ -11,7 +12,7 @@ local directions = {
 
 local function parseRay(s)
   local direction, length = string.match(s, "(%a)(%d+)")
-  local dx, dy = table.unpack(directions[direction])
+  local dx, dy = unpack(directions[direction])
   return dx, dy, tonumber(length)
 end
 

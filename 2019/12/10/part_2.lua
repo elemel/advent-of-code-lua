@@ -5,6 +5,7 @@ local compareDirections = yulea.compareDirections
 local greatestCommonDivisor = yulea.greatestCommonDivisor
 local split = yulea.split
 local squaredDistance = yulea.squaredDistance
+local unpack = unpack or table.unpack
 
 local x0 = 31
 local y0 = 20
@@ -45,19 +46,19 @@ local vaporizations = {}
 for dy, row in pairs(rays) do
   for dx, positions in pairs(row) do
     table.sort(positions, function(position1, position2)
-      return (squaredDistance(x0, y0, table.unpack(position1)) <
-        squaredDistance(x0, y0, table.unpack(position2)))
+      return (squaredDistance(x0, y0, unpack(position1)) <
+        squaredDistance(x0, y0, unpack(position2)))
     end)
 
     for z, position in ipairs(positions) do
-      table.insert(vaporizations, {z, dx, dy, table.unpack(position)})
+      table.insert(vaporizations, {z, dx, dy, unpack(position)})
     end
   end
 end
 
 table.sort(vaporizations, function(vaporization1, vaporization2)
-  local z1, dx1, dy1 = table.unpack(vaporization1)
-  local z2, dx2, dy2 = table.unpack(vaporization2)
+  local z1, dx1, dy1 = unpack(vaporization1)
+  local z2, dx2, dy2 = unpack(vaporization2)
 
   if z1 ~= z2 then
     return z1 < z2
@@ -66,5 +67,5 @@ table.sort(vaporizations, function(vaporization1, vaporization2)
   return compareDirections(-dy1, dx1, -dy2, dx2)
 end)
 
-local _, _, _, x, y = table.unpack(vaporizations[200])
+local _, _, _, x, y = unpack(vaporizations[200])
 print(100 * x + y)

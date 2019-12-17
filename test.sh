@@ -1,3 +1,7 @@
+export LUA_PATH='?.lua;?/init.lua'
+
+LUA=luajit
+
 if [ $# -eq 0 ]
 then
   days=2019/12/*
@@ -7,7 +11,7 @@ fi
 
 for day in $days
 do
-  if lua $day/part_1.lua < $day/input.txt | diff $day/answer_1.txt -
+  if $LUA $day/part_1.lua < $day/input.txt | diff $day/answer_1.txt -
   then
     tput setaf 2
     echo $day/part_1.lua: PASS
@@ -18,7 +22,7 @@ do
     tput sgr0
   fi
 
-  if lua $day/part_2.lua < $day/input.txt | diff $day/answer_2.txt -
+  if $LUA $day/part_2.lua < $day/input.txt | diff $day/answer_2.txt -
   then
     tput setaf 2
     echo $day/part_2.lua: PASS

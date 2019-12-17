@@ -7,6 +7,7 @@ local depth = yulea.depth
 local getCell = yulea.getCell
 local printGrid = yulea.printGrid
 local setCell = yulea.setCell
+local unpack = unpack or table.unpack
 
 local function key(x, y)
   return string.format("%d,%d", x, y)
@@ -28,7 +29,7 @@ local graph = {}
 
 local function search(x, y)
   for instruction, direction in ipairs(commands) do
-    local dx, dy = table.unpack(direction)
+    local dx, dy = unpack(direction)
     local char = grid[y + dy] and grid[y + dy][x + dx]
 
     if not char then

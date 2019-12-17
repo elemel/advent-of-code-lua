@@ -1,6 +1,8 @@
 local yulea = require("yulea")
 
-local leastCommonMultiple = yulea.leastCommonMultiple
+local leastCommonMultiple =
+  yulea.leastCommonMultiple64 or yulea.leastCommonMultiple
+
 local map = yulea.map
 local range = yulea.range
 
@@ -57,8 +59,11 @@ for line in io.lines() do
   end
 end
 
-print(leastCommonMultiple(map(
+local result = leastCommonMultiple(map(
   range(1, 3),
   function(axis)
     return period(positionColumns[axis], velocityColumns[axis])
-  end)))
+  end))
+
+result = string.gsub(tostring(result), "L", "")
+print(result)

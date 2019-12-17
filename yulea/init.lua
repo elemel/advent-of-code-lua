@@ -34,6 +34,7 @@ return {
   join = yuleaString.join,
   keys = yuleaTable.keys,
   leastCommonMultiple = yuleaMath.leastCommonMultiple,
+  leastCommonMultiple64 = yuleaMath.leastCommonMultiple64,
   map = yuleaIterator.map,
   maxResult = yuleaMath.maxResult,
   memoize = yuleaTable.memoize,
