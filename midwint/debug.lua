@@ -112,27 +112,27 @@ local function formatColumns(columns, columnWidth)
 end
 
 local function readParameter(program, instructionPointer, parameter)
-  local opcode = program[instructionPointer] or 0
+  local opcode = program.memory[instructionPointer] or 0
   local divisor = 10 ^ (parameter + 1)
   local mode = math.floor(opcode / divisor) % 10
-  local address = program[instructionPointer + parameter] or 0
+  local address = program.memory[instructionPointer + parameter] or 0
 
   if mode == 0 then
-    return program[address] or 0
+    return program.memory[address] or 0
   elseif mode == 1 then
     return address
   elseif mode == 2 then
-    return program[program.relativeBase + address] or 0
+    return program.memory[program.relativeBase + address] or 0
   else
     error("Invalid parameter mode")
   end
 end
 
 local function formatParameter(program, instructionPointer, parameter)
-  local opcodeModes = program[instructionPointer] or 0
+  local opcodeModes = program.memory[instructionPointer] or 0
   local divisor = 10 ^ (parameter + 1)
   local mode = math.floor(opcodeModes / divisor) % 10
-  local address = program[instructionPointer + parameter]
+  local address = program.memory[instructionPointer + parameter]
   local opcode = opcodeModes % 100
 
   if address == nil then
@@ -140,7 +140,7 @@ local function formatParameter(program, instructionPointer, parameter)
   end
 
   if mode == 0 then
-    local value = program[address] or "?"
+    local value = program.memory[address] or "?"
     local label = program.labels[address]
 
     if label then
@@ -161,7 +161,7 @@ local function formatParameter(program, instructionPointer, parameter)
 
     return magenta(address)
   elseif mode == 2 then
-    local value = program[program.relativeBase + address] or "?"
+    local value = program.memory[program.relativeBase + address] or "?"
     return cyan("rb") .. blue(string.format("%+d", address)) .. ":" .. magenta(value)
   else
     return "?"
@@ -183,7 +183,7 @@ local function formatQueue(queue)
 end
 
 local function printInstruction(program, instructionPointer)
-  local opcode = program[instructionPointer]
+  local opcode = program.memory[instructionPointer]
   opcode = opcode % 100
 
   local label = program.labels[instructionPointer]
@@ -269,7 +269,7 @@ local function formatWatch(watch, program)
   elseif watch == "oq" then
     return cyan("oq") .. "=" .. formatWatchQueue(program.outputQueue)
   else
-    local value = program[watch] or "?"
+    local value = program.memory[watch] or "?"
     return blue(watch) .. ":" .. magenta(value)
   end
 end
@@ -298,12 +298,12 @@ local function list(program, n)
   local instructionPointer = program.instructionPointer
 
   for i = 1, n do
-    if not program[instructionPointer] then
+    if not program.memory[instructionPointer] then
       break
     end
 
     if program.data[instructionPointer] then
-      print(instructionPointer .. ":" .. program[instructionPointer])
+      print(instructionPointer .. ":" .. program.memory[instructionPointer])
       instructionPointer = instructionPointer + 1
     else
       local size = printInstruction(program, instructionPointer)
@@ -393,7 +393,7 @@ local function scan(program)
 
   for i = 0, #program do
     if not program.data[i] and not parameters[i] then
-      local opcodeModes = program[i]
+      local opcodeModes = program.memory[i]
       local opcode = opcodeModes % 100
 
       local mode1 = math.floor(opcodeModes / 100) % 10
@@ -401,19 +401,19 @@ local function scan(program)
       local mode3 = math.floor(opcodeModes / 10000) % 10
 
       if opcode == 9 and mode1 == 1 then
-        if (program[i + 1] or 0) > 0 then
+        if (program.memory[i + 1] or 0) > 0 then
           func = i
         else
           if (func and
-            (program[i + 1]  or 0) == -program[func + 1] and
-            program[i + 2] == 2105 and program[i + 3] == 1 and
-            program[i + 4] == 0) then
+            (program.memory[i + 1]  or 0) == -program.memory[func + 1] and
+            program.memory[i + 2] == 2105 and program.memory[i + 3] == 1 and
+            program.memory[i + 4] == 0) then
 
             functions[func] = i + 2
           elseif (func and
-            (program[i + 1]  or 0) == -program[func + 1] and
-            program[i + 2] == 2106 and program[i + 3] == 0 and
-            program[i + 4] == 0) then
+            (program.memory[i + 1]  or 0) == -program.memory[func + 1] and
+            program.memory[i + 2] == 2106 and program.memory[i + 3] == 0 and
+            program.memory[i + 4] == 0) then
 
             functions[func] = i + 2
           else
@@ -434,7 +434,7 @@ local function scan(program)
         opcode == 6 or opcode == 7 or opcode == 8 or opcode == 9) and
         mode1 == 0) then
 
-        local var = program[i + 1] or 0
+        local var = program.memory[i + 1] or 0
         reads[var] = true
       end
 
@@ -442,24 +442,24 @@ local function scan(program)
         mode2 == 0)
       then
 
-        local var = program[i + 2] or 0
+        local var = program.memory[i + 2] or 0
         reads[var] = true
       end
 
       if ((opcode == 1 or opcode == 2 or opcode == 7 or opcode == 8) and
         mode3 == 0) then
 
-        local var = program[i + 3] or 0
+        local var = program.memory[i + 3] or 0
         writes[var] = true
       end
 
       if opcode == 3 and mode1 == 0 then
-        local var = program[i + 1] or 0
+        local var = program.memory[i + 1] or 0
         writes[var] = true
       end
 
       if (opcode == 5 or opcode == 6) and mode2 == 1 then
-        local target = program[i + 2] or 0
+        local target = program.memory[i + 2] or 0
         targets[target] = true
       end
     end

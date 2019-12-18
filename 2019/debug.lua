@@ -48,3 +48,20 @@ function day13()
   scan(program)
   return program
 end
+
+function day15()
+  local program = day(15)
+  scan(program)
+  return program
+end
+
+function day17()
+  local program = day(15)
+
+  for i = 252, 1044 do
+    program.data[i] = true
+  end
+
+  scan(program)
+  return program
+end
