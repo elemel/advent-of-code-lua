@@ -1,7 +1,4 @@
 local midwint = require("midwint")
-local yulea = require("yulea")
-
-local split = yulea.split
 
 local function containsPoint(source, x, y)
   local program = midwint.Program.new(source)

@@ -1,7 +1,4 @@
 local midwint = require("midwint")
-local yulea = require("yulea")
-
-local split = yulea.split
 
 local source = io.read()
 local totalOutput = 0
