@@ -33,6 +33,7 @@ local function containsKey(mask, char)
 end
 
 local directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}}
+local quadrants = {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}}
 
 local grid = {}
 local positions = {}
@@ -50,6 +51,22 @@ for y, line in enumerate(io.lines()) do
 
     setCell(grid, x, y, char)
   end
+end
+
+local entranceX, entranceY = unpack(positions["@"])
+positions["@"] = nil
+
+setCell(grid, entranceX, entranceY, "#")
+
+for _, direction in ipairs(directions) do
+  local dx, dy = unpack(direction)
+  setCell(grid, entranceX + dx, entranceY + dy, "#")
+end
+
+for i, offset in ipairs(quadrants) do
+  local dx, dy = unpack(offset)
+  setCell(grid, entranceX + dx, entranceY + dy, tostring(i))
+  positions[tostring(i)] = {entranceX + dx, entranceY + dy}
 end
 
 local graph = {}
@@ -85,7 +102,7 @@ for source, position in pairs(positions) do
 end
 
 local queue = heap:new()
-queue:insert(0, {"@", 0})
+queue:insert(0, {"1", "2", "3", "4", 0})
 
 local visited = {}
 
@@ -95,21 +112,29 @@ repeat
 
   if not visited[stateStr] then
     visited[stateStr] = true
-    local source, keyMask = unpack(state)
+    local keyMask = table.remove(state)
 
     if keyMask == allKeyMask then
       print(totalDistance)
       return
     end
 
-    for target, distance in pairs(graph[source]) do
-      if isKey(target) then
-        queue:insert(
-          totalDistance + distance,
-          {target, addKey(keyMask, target)})
-      elseif isDoor(target) then
-        if containsKey(keyMask, target) then
-          queue:insert(totalDistance + distance, {target, keyMask})
+    for i, source in ipairs(state) do
+      for target, distance in pairs(graph[source]) do
+        if isKey(target) then
+          local newState = {unpack(state)}
+          newState[i] = target
+          table.insert(newState, addKey(keyMask, target))
+
+          queue:insert(totalDistance + distance, newState)
+        elseif isDoor(target) then
+          if containsKey(keyMask, target) then
+            local newState = {unpack(state)}
+            newState[i] = target
+            table.insert(newState, keyMask)
+
+            queue:insert(totalDistance + distance, newState)
+          end
         end
       end
     end
