@@ -229,6 +229,16 @@ if ffi then
   end
 end
 
+local function sign(n)
+  if n < 0 then
+    return -1
+  elseif 0 < n then
+    return 1
+  else
+    return 0
+  end
+end
+
 local function squaredDistance(x1, y1, x2, y2)
   return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)
 end
@@ -298,6 +308,7 @@ return {
   maxResult = maxResult,
   minResult = minResult,
   primes = primes,
+  sign = sign,
   squaredLength = squaredLength,
   squaredDistance = squaredDistance,
   sum = sum,

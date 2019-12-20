@@ -45,6 +45,7 @@ return {
   reverse = yuleaTable.reverse,
   setCell = yuleaGrid.setCell,
   setOf = yuleaTable.setOf,
+  sign = yuleaMath.sign,
   slice = yuleaTable.slice,
   split = yuleaString.split,
   squaredDistance = yuleaMath.squaredDistance,
