@@ -11,27 +11,6 @@ local function writeLine(program, line)
   program.inputQueue:push(10)
 end
 
-local function printVideo(program)
-  local row = {}
-
-  while not program.outputQueue:isEmpty() do
-    local output = program.outputQueue:pop()
-
-    if output >= 256 then
-      return output
-    end
-
-    if output == string.byte("\n") then
-      -- print(table.concat(row))
-      row = {}
-    else
-      row[#row + 1] = string.char(output)
-    end
-  end
-
-  return nil
-end
-
 local program = midwint.Program.new(io.read())
 
 writeLine(program, "NOT J J")
@@ -43,4 +22,19 @@ writeLine(program, "AND D J")
 writeLine(program, "WALK")
 
 program:run()
-print(printVideo(program) or "X")
+local row = {}
+
+while not program.outputQueue:isEmpty() do
+  local output = program.outputQueue:pop()
+
+  if output >= 256 then
+    print(output)
+  else
+    if output == string.byte("\n") then
+      -- print(table.concat(row))
+      row = {}
+    else
+      row[#row + 1] = string.char(output)
+    end
+  end
+end

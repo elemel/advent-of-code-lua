@@ -11,16 +11,25 @@ local function writeLine(program, line)
   program.inputQueue:push(10)
 end
 
-local function printVideo(program)
-  local row = {}
+local program = midwint.Program.new(io.read())
 
-  while not program.outputQueue:isEmpty() do
-    local output = program.outputQueue:pop()
+writeLine(program, "NOT H J")
+writeLine(program, "OR C J")
+writeLine(program, "AND A J")
+writeLine(program, "AND B J")
+writeLine(program, "NOT J J")
+writeLine(program, "AND D J")
+writeLine(program, "RUN")
 
-    if output >= 256 then
-      return output
-    end
+program:run()
+local row = {}
 
+while not program.outputQueue:isEmpty() do
+  local output = program.outputQueue:pop()
+
+  if output >= 256 then
+    print(output)
+  else
     if output == string.byte("\n") then
       -- print(table.concat(row))
       row = {}
@@ -28,23 +37,4 @@ local function printVideo(program)
       row[#row + 1] = string.char(output)
     end
   end
-
-  return nil
 end
-
-local program = midwint.Program.new(io.read())
-
-writeLine(program, "NOT A J")
-
-writeLine(program, "NOT B T")
-writeLine(program, "OR T J")
-
-writeLine(program, "NOT C T")
-writeLine(program, "AND H T")
-writeLine(program, "OR T J")
-
-writeLine(program, "AND D J")
-writeLine(program, "RUN")
-program:run()
-
-print(printVideo(program) or "X")
