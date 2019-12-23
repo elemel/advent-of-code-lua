@@ -25,6 +25,7 @@ return {
   digits = yuleaMath.digits,
   elements = yuleaTable.elements,
   enumerate = yuleaIterator.enumerate,
+  factors = yuleaMath.factors,
   findValue = yuleaTable.findValue,
   firstDuplicate = yuleaIterator.firstDuplicate,
   getCell = yuleaGrid.getCell,
