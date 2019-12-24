@@ -39,6 +39,7 @@ return {
   map = yuleaIterator.map,
   maxResult = yuleaMath.maxResult,
   memoize = yuleaTable.memoize,
+  minResult = yuleaMath.minResult,
   permutations = yuleaTable.permutations,
   printGrid = yuleaGrid.printGrid,
   range = yuleaIterator.range,
@@ -60,4 +61,5 @@ return {
   toTable = yuleaTable.toTable,
   toTuple = yuleaIterator.toTuple,
   transpose = yuleaMath.transpose,
+  values = yuleaTable.values,
 }
