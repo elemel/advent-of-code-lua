@@ -395,6 +395,9 @@ local function scan(program)
   local writes = {}
   local targets = {}
   local functions = {}
+  local jumps = {}
+  local calls = {}
+  local returns = {}
 
   local func
 
@@ -469,6 +472,18 @@ local function scan(program)
         local target = program.memory[i + 2] or 0
         targets[target] = true
       end
+
+      if opcode == 5 or opcode == 6 then
+        jumps[i] = true
+      end
+
+      if opcode == 5 and mode1 == 1 and program.memory[i + 1] == 1 and mode2 == 2 and program.memory[i + 2] == 0 then
+        returns[i] = true
+      end
+
+      if opcode == 6 and mode1 == 1 and program.memory[i + 1] == 0 and mode2 == 2 and program.memory[i + 2] == 0 then
+        returns[i] = true
+      end
     end
   end
 
@@ -476,14 +491,16 @@ local function scan(program)
     if not program.labels[i] then
       if functions[i] then
         program.labels[i] = "f" .. i
+      elseif calls[i] then
+        program.labels[i] = "c" .. i
+      elseif returns[i] then
+        program.labels[i] = "r" .. i
       elseif targets[i] then
         program.labels[i] = "t" .. i
       -- elseif instructions[i] then
         -- program.labels[i] = "i" .. i
-      elseif writes[i] then
-        program.labels[i] = "w" .. i
-      elseif reads[i] then
-        program.labels[i] = "r" .. i
+      elseif reads[i] or writes[i] then
+        program.labels[i] = "v" .. i
       end
 
       if program.labels[i] then

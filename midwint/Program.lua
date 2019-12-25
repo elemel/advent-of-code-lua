@@ -125,6 +125,19 @@ local operations = {
   [99] = halt,
 }
 
+local instructionSizes = {
+  [1] = 4,
+  [2] = 4,
+  [3] = 2,
+  [4] = 2,
+  [5] = 3,
+  [6] = 3,
+  [7] = 4,
+  [8] = 4,
+  [9] = 2,
+  [99] = 1,
+}
+
 local Program = {}
 Program.__index = Program
 
@@ -147,9 +160,12 @@ function Program.new(source)
   program.outputQueue = Queue.new()
 
   program.breakpoints = {}
-  program.data = {}
   program.labels = {}
   program.watches = {"ip", "rb", "iq", "oq"}
+
+  program.data = {}
+  program.instructions = {}
+  program.parameters = {}
 
   return setmetatable(program, Program)
 end
@@ -167,8 +183,19 @@ function Program:step()
   end
 
   local operation = assert(operations[opcode], "Invalid opcode")
-  operation(self)
 
+  if not self.instructions[self.instructionPointer] then
+    self.instructions[self.instructionPointer] = 1
+
+    for i = 1, instructionSizes[opcode] - 1 do
+      self.parameters[self.instructionPointer + i] = true
+    end
+  else
+    self.instructions[self.instructionPointer] =
+      self.instructions[self.instructionPointer] + 1
+  end
+
+  operation(self)
   return true
 end
 
@@ -207,9 +234,12 @@ function Program:clone()
   program.outputQueue = Queue.new()
 
   program.breakpoints = {}
-  program.data = {}
   program.labels = {}
   program.watches = {"ip", "rb", "iq", "oq"}
+
+  program.data = {}
+  program.instructions = {}
+  program.parameters = {}
 
   return setmetatable(program, Program)
 end
