@@ -303,7 +303,14 @@ local function list(program, n)
     end
 
     if program.data[instructionPointer] then
-      print(instructionPointer .. ":" .. program.memory[instructionPointer])
+      local value = program.memory[instructionPointer]
+      local line = instructionPointer .. ":" .. value
+
+      if value >= 32 and value <= 126 then
+        line = line .. "\t\t" .. string.char(value)
+      end
+
+      print(line)
       instructionPointer = instructionPointer + 1
     else
       local size = printInstruction(program, instructionPointer)

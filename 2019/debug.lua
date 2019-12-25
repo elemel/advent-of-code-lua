@@ -65,3 +65,26 @@ function day17()
   scan(program)
   return program
 end
+
+function day25()
+  local program = day(25)
+
+  for i = 43, 1129 do
+    program.data[i] = true
+  end
+
+  for i = 1894, 1946 do
+    program.data[i] = true
+  end
+
+  for i = 2963, 3009 do
+    program.data[i] = true
+  end
+
+  for i = 3094, 4817 do
+    program.data[i] = true
+  end
+
+  scan(program)
+  return program
+end
