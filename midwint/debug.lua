@@ -398,7 +398,7 @@ local function scan(program)
 
   local func
 
-  for i = 0, #program do
+  for i = 0, #program.memory do
     if not program.data[i] and not parameters[i] then
       local opcodeModes = program.memory[i]
       local opcode = opcodeModes % 100
@@ -472,7 +472,7 @@ local function scan(program)
     end
   end
 
-  for i = 0, #program do
+  for i = 0, #program.memory do
     if not program.labels[i] then
       if functions[i] then
         program.labels[i] = "f" .. i
