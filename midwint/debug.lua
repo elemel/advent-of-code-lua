@@ -477,13 +477,32 @@ local function scan(program)
         jumps[i] = true
       end
 
-      if opcode == 5 and mode1 == 1 and program.memory[i + 1] == 1 and mode2 == 2 and program.memory[i + 2] == 0 then
+      if opcode == 5 and
+        mode1 == 1 and program.memory[i + 1] == 1 and
+        mode2 == 2 and program.memory[i + 2] == 0 then
+
         returns[i] = true
       end
 
-      if opcode == 6 and mode1 == 1 and program.memory[i + 1] == 0 and mode2 == 2 and program.memory[i + 2] == 0 then
+      if opcode == 6 and
+        mode1 == 1 and program.memory[i + 1] == 0 and
+        mode2 == 2 and program.memory[i + 2] == 0 then
+
         returns[i] = true
       end
+    end
+  end
+
+  for i in pairs(jumps) do
+    local opcodeModes = program.memory[i]
+    local opcode = opcodeModes % 100
+
+    local mode1 = math.floor(opcodeModes / 100) % 10
+    local mode2 = math.floor(opcodeModes / 1000) % 10
+    local mode3 = math.floor(opcodeModes / 10000) % 10
+
+    if mode2 == 1 and functions[program.memory[i + 2]] then
+      calls[i] = true
     end
   end
 
