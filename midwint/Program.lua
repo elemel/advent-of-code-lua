@@ -167,6 +167,9 @@ function Program.new(source)
   program.instructions = {}
   program.parameters = {}
 
+  program.functions = {}
+  program.indentations = {}
+
   return setmetatable(program, Program)
 end
 
@@ -240,6 +243,9 @@ function Program:clone()
   program.data = {}
   program.instructions = {}
   program.parameters = {}
+
+  program.functions = {}
+  program.indentations = {}
 
   return setmetatable(program, Program)
 end

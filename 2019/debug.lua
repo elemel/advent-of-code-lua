@@ -69,15 +69,47 @@ end
 function day25()
   local program = day(25)
 
-  for i = 43, 1129 do
+  for i = 34, 1129 do
     program.data[i] = true
   end
 
-  for i = 1894, 1946 do
+  for i = 1308, 1309 do
     program.data[i] = true
   end
 
-  for i = 2963, 3009 do
+  for i = 1352, 1352 do
+    program.data[i] = true
+  end
+
+  for i = 1550, 1552 do
+    program.data[i] = true
+  end
+
+  for i = 1894, 1983 do
+    program.data[i] = true
+  end
+
+  for i = 2124, 2124 do
+    program.data[i] = true
+  end
+
+  for i = 2280, 2280 do
+    program.data[i] = true
+  end
+
+  for i = 2486, 2486 do
+    program.data[i] = true
+  end
+
+  for i = 2523, 2524 do
+    program.data[i] = true
+  end
+
+  for i = 2721, 2721 do
+    program.data[i] = true
+  end
+
+  for i = 2959, 3009 do
     program.data[i] = true
   end
 

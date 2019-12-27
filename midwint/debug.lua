@@ -80,7 +80,7 @@ local function yellow(s)
 end
 
 local function formatColumns(columns, columnWidth)
-  columnWidth = columnWidth or 16
+  columnWidth = columnWidth or 14
 
   local buffer = {}
   local totalWidth = 0
@@ -183,8 +183,8 @@ local function formatQueue(queue)
 end
 
 local function printInstruction(program, instructionPointer)
-  local opcode = program.memory[instructionPointer]
-  opcode = opcode % 100
+  local opcodeModes = program.memory[instructionPointer]
+  local opcode = opcodeModes % 100
 
   local label = program.labels[instructionPointer]
 
@@ -197,27 +197,19 @@ local function printInstruction(program, instructionPointer)
   local name = operationNames[opcode]
 
   if name then
-    if name == "hcf" then
-      name = red(name)
-    elseif name == "in" then
-      if program.inputQueue:isEmpty() then
-        name = red(name)
-      else
-        name = yellow(name)
-      end
-    elseif name == "jif" then
-      local value = readParameter(program, instructionPointer, 1)
+    if name == "jif" or name == "jit" then
+      if math.floor(opcodeModes / 1000) % 10 == 1 then
+        local target = program.memory[instructionPointer + 2] or 0
 
-      if value == 0 then
-        name = green(name)
-      else
-        name = yellow(name)
-      end
-    elseif name == "jit" then
-      local value = readParameter(program, instructionPointer, 1)
-
-      if value ~= 0 then
-        name = green(name)
+        if not program.functions[target] then
+          if instructionPointer < target then
+            name = green(name)
+          else
+            name = red(name)
+          end
+        else
+          name = yellow(name)
+        end
       else
         name = yellow(name)
       end
@@ -242,8 +234,35 @@ local function printInstruction(program, instructionPointer)
     table.insert(columns, formatParameter(program, instructionPointer, j))
   end
 
-  print(formatColumns(columns, 16))
+  local indentation =
+    string.rep("  ", program.indentations[instructionPointer] or 0)
+
+  print(indentation .. formatColumns(columns))
   return size
+end
+
+local function printData(program, instructionPointer)
+  local columns = {}
+
+  repeat
+    local value = program.memory[instructionPointer]
+    local column = magenta(value)
+    local label = program.labels[instructionPointer]
+
+    if #columns == 0 or label then
+      if label then
+        column = cyan(label) .. ":" .. column
+      else
+        column = blue(instructionPointer) .. ":" .. column
+      end
+    end
+
+    table.insert(columns, column)
+    instructionPointer = instructionPointer + 1
+  until #columns == 4 or not program.data[instructionPointer]
+
+  print(formatColumns(columns))
+  return #columns
 end
 
 local function formatWatchQueue(queue)
@@ -296,6 +315,7 @@ local function list(program, n)
   end
 
   local instructionPointer = program.instructionPointer
+  local memoryType = nil
 
   for i = 1, n do
     if not program.memory[instructionPointer] then
@@ -303,16 +323,23 @@ local function list(program, n)
     end
 
     if program.data[instructionPointer] then
-      local value = program.memory[instructionPointer]
-      local line = instructionPointer .. ":" .. value
-
-      if value >= 32 and value <= 126 then
-        line = line .. "\t\t" .. string.char(value)
+      if memoryType and memoryType ~= "data" then
+        print()
       end
 
-      print(line)
-      instructionPointer = instructionPointer + 1
+      memoryType = "data"
+
+      local size = printData(program, instructionPointer)
+      instructionPointer = instructionPointer + size
     else
+      if memoryType and memoryType ~= "instruction" or
+        program.functions[instructionPointer] then
+
+        print()
+      end
+
+      memoryType = "instruction"
+
       local size = printInstruction(program, instructionPointer)
       instructionPointer = instructionPointer + size
     end
@@ -332,7 +359,7 @@ local function list(program, n)
       table.insert(columns, watches[j])
     end
 
-    print(formatColumns(columns, 16))
+    print(formatColumns(columns))
   end
 end
 
@@ -493,6 +520,7 @@ local function scan(program)
     end
   end
 
+  -- Detect calls and apply indentations for jumps
   for i in pairs(jumps) do
     local opcodeModes = program.memory[i]
     local opcode = opcodeModes % 100
@@ -503,29 +531,48 @@ local function scan(program)
 
     if mode2 == 1 and functions[program.memory[i + 2]] then
       calls[i] = true
+    elseif mode2 == 1 then
+      local j = program.memory[i + 2]
+      local dk = j < i and -1 or 1
+
+      for k = i + dk, j - dk, dk do
+        program.indentations[k] = (program.indentations[k] or 0) + 1
+      end
     end
   end
+
+  for k, v in pairs(functions) do
+    program.functions[k] = v
+  end
+
+  -- Update labels
+  local newLabels = {}
 
   for i = 0, #program.memory do
     if not program.labels[i] then
       if functions[i] then
         program.labels[i] = "f" .. i
-      elseif calls[i] then
-        program.labels[i] = "c" .. i
-      elseif returns[i] then
-        program.labels[i] = "r" .. i
+      -- elseif calls[i] then
+      --   program.labels[i] = "c" .. i
+      -- elseif returns[i] then
+      --   program.labels[i] = "r" .. i
       elseif targets[i] then
         program.labels[i] = "t" .. i
-      -- elseif instructions[i] then
-        -- program.labels[i] = "i" .. i
       elseif reads[i] or writes[i] then
         program.labels[i] = "v" .. i
       end
 
       if program.labels[i] then
-        print(program.labels[i])
+        -- print(program.labels[i])
+        table.insert(newLabels, program.labels[i])
       end
     end
+  end
+
+  if #newLabels == 0 then
+    print("No new labels")
+  else
+    print("New labels: " .. table.concat(newLabels, ", "))
   end
 end
 
