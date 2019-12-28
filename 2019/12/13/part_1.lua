@@ -6,9 +6,9 @@ program:run()
 local screen = {}
 
 while not program.outputQueue:is_empty() do
-  local x = program.outputQueue:pop_left()
-  local y = program.outputQueue:pop_left()
-  local id = program.outputQueue:pop_left()
+  local x = program:read()
+  local y = program:read()
+  local id = program:read()
 
   screen[y] = screen[y] or {}
   screen[y][x] = id

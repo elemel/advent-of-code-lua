@@ -36,9 +36,9 @@ local function search(x, y)
     local char = grid[y + dy] and grid[y + dy][x + dx]
 
     if not char then
-      program.inputQueue:push_right(instruction)
+      program:write(instruction)
       program:run()
-      local status = program.outputQueue:pop_left()
+      local status = program:read()
 
       if status == 0 then
         setCell(grid, x + dx, y + dy, "#")
@@ -51,9 +51,9 @@ local function search(x, y)
         setCell(grid, x + dx, y + dy, ".")
         search(x + dx, y + dy)
 
-        program.inputQueue:push_right(backtrackInstructions[instruction])
+        program:write(backtrackInstructions[instruction])
         program:run()
-        assert(program.outputQueue:pop_left() ~= 0)
+        assert(program:read() ~= 0)
       else
         error("Invalid status")
       end

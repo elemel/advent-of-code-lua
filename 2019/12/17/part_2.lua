@@ -16,10 +16,10 @@ end
 
 local function writeLine(program, line)
   for char in split(line) do
-    program.inputQueue:push_right(string.byte(char))
+    program:write(string.byte(char))
   end
 
-  program.inputQueue:push_right(10)
+  program:write(10)
 end
 
 local function printVideo(program)
@@ -27,7 +27,7 @@ local function printVideo(program)
   local grid = {{}}
 
   while not program.outputQueue:is_empty() do
-    local output = program.outputQueue:pop_left()
+    local output = program:read()
 
     if output >= 256 then
       result = output

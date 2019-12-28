@@ -38,7 +38,7 @@ local count = 0
 
 repeat
   grid[y] = grid[y] or {}
-  program.inputQueue:push_right(grid[y][x] or 0)
+  program:write(grid[y][x] or 0)
   program:run()
 
   if not grid[y][x] then
@@ -51,8 +51,8 @@ repeat
     maxY = math.max(maxY, y)
   end
 
-  grid[y][x] = program.outputQueue:pop_left()
-  local turn = program.outputQueue:pop_left()
+  grid[y][x] = program:read()
+  local turn = program:read()
   dx, dy = turners[turn](dx, dy)
 
   x = x + dx

@@ -5,30 +5,30 @@ local network = {}
 
 for networkAddress = 0, 49 do
   network[networkAddress] = intcode.Program.new(source)
-  network[networkAddress].inputQueue:push_right(networkAddress)
+  network[networkAddress]:write(networkAddress)
 end
 
 while true do
   for networkAddress = 0, 49 do
     if network[networkAddress]:isBlocked() then
-      network[networkAddress].inputQueue:push_right(-1)
+      network[networkAddress]:write(-1)
     end
 
     network[networkAddress]:run()
 
     while not network[networkAddress].outputQueue:is_empty() do
-      local destinationAddress = network[networkAddress].outputQueue:pop_left()
+      local destinationAddress = network[networkAddress]:read()
 
-      local x = network[networkAddress].outputQueue:pop_left()
-      local y = network[networkAddress].outputQueue:pop_left()
+      local x = network[networkAddress]:read()
+      local y = network[networkAddress]:read()
 
       if destinationAddress == 255 then
         print(y)
         return
       end
 
-      network[destinationAddress].inputQueue:push_right(x)
-      network[destinationAddress].inputQueue:push_right(y)
+      network[destinationAddress]:write(x)
+      network[destinationAddress]:write(y)
     end
   end
 end

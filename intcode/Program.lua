@@ -51,7 +51,7 @@ local function multiply(program)
 end
 
 local function input(program)
-  local value = assert(program.inputQueue:pop_left(), "Empty queue")
+  local value = assert(program.inputQueue:pop_left(), "Empty input queue")
   write(program, 1, value)
   program.instructionPointer = program.instructionPointer + 2
 end
@@ -248,6 +248,15 @@ function Program:clone()
   program.indentations = {}
 
   return setmetatable(program, Program)
+end
+
+function Program:write(value)
+  self.inputQueue:push_right(value)
+end
+
+function Program:read()
+  assert(not self.outputQueue:is_empty(), "Empty output queue")
+  return self.outputQueue:pop_left()
 end
 
 return Program
