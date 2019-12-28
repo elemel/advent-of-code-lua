@@ -23,16 +23,16 @@ local screen = {}
 local score = 0
 
 repeat
-  program.inputQueue:push(input)
+  program.inputQueue:push_right(input)
   program:run()
 
   local paddleX
   local ballX
 
-  while not program.outputQueue:isEmpty() do
-    local x = program.outputQueue:pop()
-    local y = program.outputQueue:pop()
-    local id = program.outputQueue:pop()
+  while not program.outputQueue:is_empty() do
+    local x = program.outputQueue:pop_left()
+    local y = program.outputQueue:pop_left()
+    local id = program.outputQueue:pop_left()
 
     if x == -1 and y == 0 then
       score = id

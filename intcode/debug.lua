@@ -299,11 +299,11 @@ local function list(program, n)
   if program:isHalted() then
     print("Program is halted")
 
-    if not program.inputQueue:isEmpty() then
+    if not program.inputQueue:is_empty() then
       print("Input queue: " .. formatQueue(program.inputQueue))
     end
 
-    if not program.outputQueue:isEmpty() then
+    if not program.outputQueue:is_empty() then
       print("Output queue: " .. formatQueue(program.outputQueue))
     end
 
@@ -364,14 +364,14 @@ local function list(program, n)
 end
 
 local function read(program)
-  if program.outputQueue:isEmpty() then
+  if program.outputQueue:is_empty() then
     print("Empty output queue")
     return
   end
 
-  local value = program.outputQueue:pop()
+  local value = program.outputQueue:pop_left()
 
-  if not program.outputQueue:isEmpty() then
+  if not program.outputQueue:is_empty() then
     print("Output queue: " .. formatQueue(program.outputQueue))
   end
 
@@ -397,13 +397,13 @@ local function status(program)
     print("Program is blocked")
   end
 
-  if program.inputQueue:isEmpty() then
+  if program.inputQueue:is_empty() then
     print("Empty input queue")
   else
     print("Input queue: " .. formatQueue(program.inputQueue))
   end
 
-  if program.outputQueue:isEmpty() then
+  if program.outputQueue:is_empty() then
     print("Empty output queue")
   else
     print("Output queue: " .. formatQueue(program.outputQueue))
@@ -411,7 +411,7 @@ local function status(program)
 end
 
 local function write(program, value)
-  program.inputQueue:push(value)
+  program.inputQueue:push_right(value)
   print("Input queue: " .. formatQueue(program.inputQueue))
 end
 

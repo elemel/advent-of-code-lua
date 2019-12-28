@@ -5,7 +5,7 @@ local network = {}
 
 for networkAddress = 0, 49 do
   network[networkAddress] = intcode.Program.new(source)
-  network[networkAddress].inputQueue:push(networkAddress)
+  network[networkAddress].inputQueue:push_right(networkAddress)
 end
 
 local natX, natY
@@ -16,28 +16,29 @@ while true do
 
   for networkAddress = 0, 49 do
     if network[networkAddress]:isBlocked() then
-      network[networkAddress].inputQueue:push(-1)
+      network[networkAddress].inputQueue:push_right(-1)
     else
       idle = false
     end
 
     network[networkAddress]:run()
 
-    if not network[networkAddress].outputQueue:isEmpty() then
+    if not network[networkAddress].outputQueue:is_empty() then
       idle = false
 
-      while not network[networkAddress].outputQueue:isEmpty() do
-        local destinationAddress = network[networkAddress].outputQueue:pop()
+      while not network[networkAddress].outputQueue:is_empty() do
+        local destinationAddress =
+          network[networkAddress].outputQueue:pop_left()
 
-        local x = network[networkAddress].outputQueue:pop()
-        local y = network[networkAddress].outputQueue:pop()
+        local x = network[networkAddress].outputQueue:pop_left()
+        local y = network[networkAddress].outputQueue:pop_left()
 
         if destinationAddress == 255 then
           natX = x
           natY = y
         else
-          network[destinationAddress].inputQueue:push(x)
-          network[destinationAddress].inputQueue:push(y)
+          network[destinationAddress].inputQueue:push_right(x)
+          network[destinationAddress].inputQueue:push_right(y)
         end
       end
     end
@@ -51,8 +52,8 @@ while true do
       return
     end
 
-    network[0].inputQueue:push(natX)
-    network[0].inputQueue:push(natY)
+    network[0].inputQueue:push_right(natX)
+    network[0].inputQueue:push_right(natY)
     lastNatY = natY
   end
 end

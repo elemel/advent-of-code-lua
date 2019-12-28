@@ -5,10 +5,10 @@ program:run()
 
 local screen = {}
 
-while not program.outputQueue:isEmpty() do
-  local x = program.outputQueue:pop()
-  local y = program.outputQueue:pop()
-  local id = program.outputQueue:pop()
+while not program.outputQueue:is_empty() do
+  local x = program.outputQueue:pop_left()
+  local y = program.outputQueue:pop_left()
+  local id = program.outputQueue:pop_left()
 
   screen[y] = screen[y] or {}
   screen[y][x] = id

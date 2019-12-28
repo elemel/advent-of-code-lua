@@ -7,12 +7,12 @@ for y = 0, 49 do
   for x = 0, 49 do
     local program = intcode.Program.new(source)
 
-    program.inputQueue:push(x)
-    program.inputQueue:push(y)
+    program.inputQueue:push_right(x)
+    program.inputQueue:push_right(y)
 
     program:run()
 
-    local output = program.outputQueue:pop()
+    local output = program.outputQueue:pop_left()
     totalOutput = totalOutput + output
   end
 end

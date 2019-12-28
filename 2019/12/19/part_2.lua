@@ -3,12 +3,12 @@ local intcode = require("intcode")
 local function containsPoint(source, x, y)
   local program = intcode.Program.new(source)
 
-  program.inputQueue:push(x)
-  program.inputQueue:push(y)
+  program.inputQueue:push_right(x)
+  program.inputQueue:push_right(y)
 
   program:run()
 
-  return program.outputQueue:pop() ~= 0
+  return program.outputQueue:pop_left() ~= 0
 end
 
 local source = io.read()

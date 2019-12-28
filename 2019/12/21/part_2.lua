@@ -5,10 +5,10 @@ local split = yulea.split
 
 local function writeLine(program, line)
   for char in split(line) do
-    program.inputQueue:push(string.byte(char))
+    program.inputQueue:push_right(string.byte(char))
   end
 
-  program.inputQueue:push(10)
+  program.inputQueue:push_right(10)
 end
 
 local program = intcode.Program.new(io.read())
@@ -24,8 +24,8 @@ writeLine(program, "RUN")
 program:run()
 local row = {}
 
-while not program.outputQueue:isEmpty() do
-  local output = program.outputQueue:pop()
+while not program.outputQueue:is_empty() do
+  local output = program.outputQueue:pop_left()
 
   if output >= 256 then
     print(output)

@@ -1,4 +1,4 @@
-local Queue = require("intcode.Queue")
+local deque = require("intcode.deque")
 
 local function read(program, param)
   local opcode = program.memory[program.instructionPointer] or 0
@@ -51,14 +51,14 @@ local function multiply(program)
 end
 
 local function input(program)
-  local value = program.inputQueue:pop()
+  local value = assert(program.inputQueue:pop_left(), "Empty queue")
   write(program, 1, value)
   program.instructionPointer = program.instructionPointer + 2
 end
 
 local function output(program)
   local value = read(program, 1)
-  program.outputQueue:push(value)
+  program.outputQueue:push_right(value)
   program.instructionPointer = program.instructionPointer + 2
 end
 
@@ -156,8 +156,8 @@ function Program.new(source)
   program.instructionPointer = 0
   program.relativeBase = 0
 
-  program.inputQueue = Queue.new()
-  program.outputQueue = Queue.new()
+  program.inputQueue = deque.new()
+  program.outputQueue = deque.new()
 
   program.breakpoints = {}
   program.labels = {}
@@ -181,7 +181,7 @@ function Program:step()
   local opcode = self.memory[self.instructionPointer] or 0
   opcode = opcode % 100
 
-  if opcode == 3 and self.inputQueue:isEmpty() then
+  if opcode == 3 and self.inputQueue:is_empty() then
     return false
   end
 
@@ -214,7 +214,7 @@ function Program:isBlocked()
   local opcode =
     self.instructionPointer and self.memory[self.instructionPointer] or 0
 
-  return opcode % 100 == 3 and self.inputQueue:isEmpty()
+  return opcode % 100 == 3 and self.inputQueue:is_empty()
 end
 
 function Program:isHalted()
@@ -233,8 +233,8 @@ function Program:clone()
   program.instructionPointer = self.instructionPointer
   program.relativeBase = self.relativeBase
 
-  program.inputQueue = Queue.new()
-  program.outputQueue = Queue.new()
+  program.inputQueue = deque.new()
+  program.outputQueue = deque.new()
 
   program.breakpoints = {}
   program.labels = {}

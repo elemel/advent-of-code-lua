@@ -27,15 +27,15 @@ local count = 0
 
 repeat
   grid[y] = grid[y] or {}
-  program.inputQueue:push(grid[y][x] or 0)
+  program.inputQueue:push_right(grid[y][x] or 0)
   program:run()
 
   if not grid[y][x] then
     count = count + 1
   end
 
-  grid[y][x] = program.outputQueue:pop()
-  local turn = program.outputQueue:pop()
+  grid[y][x] = program.outputQueue:pop_left()
+  local turn = program.outputQueue:pop_left()
   dx, dy = turners[turn](dx, dy)
 
   x = x + dx

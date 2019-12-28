@@ -16,8 +16,8 @@ program:run()
 
 local grid = {{}}
 
-while not program.outputQueue:isEmpty() do
-  local output = program.outputQueue:pop()
+while not program.outputQueue:is_empty() do
+  local output = program.outputQueue:pop_left()
 
   if output == 10 then
     table.insert(grid, {})
