@@ -1,11 +1,11 @@
-local midwint = require("midwint")
+local intcode = require("intcode")
 local yulea = require("yulea")
 
 local band = bit.band
 local lshift = bit.lshift
 local split = yulea.split
 
-local program = midwint.Program.new(io.read())
+local program = intcode.Program.new(io.read())
 
 local function readLine(program)
   local chars = {}

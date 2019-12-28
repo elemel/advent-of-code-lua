@@ -1,7 +1,7 @@
-local midwint = require("midwint")
+local intcode = require("intcode")
 
 local function containsPoint(source, x, y)
-  local program = midwint.Program.new(source)
+  local program = intcode.Program.new(source)
 
   program.inputQueue:push(x)
   program.inputQueue:push(y)

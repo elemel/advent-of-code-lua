@@ -1,6 +1,6 @@
-local midwint = require("midwint")
+local intcode = require("intcode")
 
-local program = midwint.Program.new(io.read())
+local program = intcode.Program.new(io.read())
 program:run()
 
 local screen = {}

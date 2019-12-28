@@ -1,4 +1,4 @@
-local midwint = require("midwint")
+local intcode = require("intcode")
 local yulea = require("yulea")
 
 local function getLoopedCell(grid, x, y)
@@ -11,7 +11,7 @@ local function getLoopedCell(grid, x, y)
   return grid[y][x]
 end
 
-local program = midwint.Program.new(io.read())
+local program = intcode.Program.new(io.read())
 program:run()
 
 local grid = {{}}

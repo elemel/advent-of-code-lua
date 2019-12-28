@@ -1,4 +1,4 @@
-local midwint = require("midwint")
+local intcode = require("intcode")
 local yulea = require("yulea")
 
 local split = yulea.split
@@ -11,7 +11,7 @@ local function writeLine(program, line)
   program.inputQueue:push(10)
 end
 
-local program = midwint.Program.new(io.read())
+local program = intcode.Program.new(io.read())
 
 writeLine(program, "NOT H J")
 writeLine(program, "OR C J")

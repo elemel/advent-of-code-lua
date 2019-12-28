@@ -1,5 +1,5 @@
 local deque = require("deque")
-local midwint = require("midwint")
+local intcode = require("intcode")
 local yulea = require("yulea")
 
 local breadthFirstSearch = yulea.breadthFirstSearch
@@ -16,7 +16,7 @@ end
 local commands = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}}
 local backtrackInstructions = {2, 1, 4, 3}
 
-local program = midwint.Program.new(io.read())
+local program = intcode.Program.new(io.read())
 
 local queue = deque.new()
 queue:push_right({0, 0, 0, program})

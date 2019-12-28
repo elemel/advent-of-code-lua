@@ -1,17 +1,17 @@
-midwint = require("midwint")
+intcode = require("intcode")
 
-list = midwint.debug.list
-read = midwint.debug.read
-run = midwint.debug.run
-scan = midwint.debug.scan
-status = midwint.debug.status
-step = midwint.debug.step
-write = midwint.debug.write
+list = intcode.debug.list
+read = intcode.debug.read
+run = intcode.debug.run
+scan = intcode.debug.scan
+status = intcode.debug.status
+step = intcode.debug.step
+write = intcode.debug.write
 
 function day(n)
   local filename = string.format("2019/12/%02d/input.txt", n)
   local source = io.open(filename):read()
-  return midwint.Program.new(source)
+  return intcode.Program.new(source)
 end
 
 function day2()

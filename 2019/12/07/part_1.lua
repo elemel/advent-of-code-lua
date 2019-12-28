@@ -1,4 +1,4 @@
-local midwint = require("midwint")
+local intcode = require("intcode")
 local yulea = require("yulea")
 
 local elements = yulea.elements
@@ -10,7 +10,7 @@ local function signal(source, phases)
   local result = 0
 
   for phase in elements(phases) do
-    local amplifier = midwint.Program.new(source)
+    local amplifier = intcode.Program.new(source)
 
     amplifier.inputQueue:push(phase)
     amplifier.inputQueue:push(result)

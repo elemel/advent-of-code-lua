@@ -1,7 +1,7 @@
-local midwint = require("midwint")
+local intcode = require("intcode")
 
 local source = io.read()
-local program = midwint.Program.new(source)
+local program = intcode.Program.new(source)
 program.inputQueue:push(1)
 program:run()
 

@@ -1,7 +1,7 @@
-local midwint = require("midwint")
+local intcode = require("intcode")
 
 local function run(source, noun, verb)
-  local program = midwint.Program.new(source)
+  local program = intcode.Program.new(source)
 
   program.memory[1] = noun
   program.memory[2] = verb

@@ -1,6 +1,5 @@
-local midwint = require("midwint")
+local intcode = require("intcode")
 local yulea = require("yulea")
-
 
 local function turnLeft(dx, dy)
   return dy, -dx
@@ -15,7 +14,7 @@ local turners = {
   [1] = turnRight,
 }
 
-local program = midwint.Program.new(io.read())
+local program = intcode.Program.new(io.read())
 
 local x = 0
 local y = 0

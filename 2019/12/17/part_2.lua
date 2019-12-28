@@ -1,4 +1,4 @@
-local midwint = require("midwint")
+local intcode = require("intcode")
 local yulea = require("yulea")
 
 local printGrid = yulea.printGrid
@@ -45,7 +45,7 @@ local function printVideo(program)
   return result
 end
 
-local program = midwint.Program.new(io.read())
+local program = intcode.Program.new(io.read())
 program.memory[0] = 2
 writeLine(program, "A,A,B,C,B,C,B,C,C,A")
 writeLine(program, "L,10,R,8,R,8")

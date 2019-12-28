@@ -1,4 +1,4 @@
-local ansicolors = require("midwint.ansicolors")
+local ansicolors = require("intcode.ansicolors")
 
 local operationNames = {
   [1] = "add",

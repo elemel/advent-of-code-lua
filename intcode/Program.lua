@@ -1,4 +1,4 @@
-local Queue = require("midwint.Queue")
+local Queue = require("intcode.Queue")
 
 local function read(program, param)
   local opcode = program.memory[program.instructionPointer] or 0

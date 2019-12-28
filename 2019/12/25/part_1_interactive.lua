@@ -1,9 +1,9 @@
-local midwint = require("midwint")
+local intcode = require("intcode")
 local yulea = require("yulea")
 
 local split = yulea.split
 
-local program = midwint.Program.new(io.open("2019/12/25/input.txt"):read())
+local program = intcode.Program.new(io.open("2019/12/25/input.txt"):read())
 
 local function writeLine(program, line)
   for char in split(line) do

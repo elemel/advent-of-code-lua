@@ -1,10 +1,10 @@
-local midwint = require("midwint")
+local intcode = require("intcode")
 
 local source = io.read()
 local network = {}
 
 for networkAddress = 0, 49 do
-  network[networkAddress] = midwint.Program.new(source)
+  network[networkAddress] = intcode.Program.new(source)
   network[networkAddress].inputQueue:push(networkAddress)
 end
 
