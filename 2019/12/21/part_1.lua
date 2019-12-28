@@ -24,7 +24,7 @@ writeLine(program, "WALK")
 program:run()
 local row = {}
 
-while not program.outputQueue:is_empty() do
+while program:hasOutput() do
   local output = program:read()
 
   if output >= 256 then

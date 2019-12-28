@@ -5,7 +5,7 @@ program:run()
 
 local screen = {}
 
-while not program.outputQueue:is_empty() do
+while program:hasOutput() do
   local x = program:read()
   local y = program:read()
   local id = program:read()

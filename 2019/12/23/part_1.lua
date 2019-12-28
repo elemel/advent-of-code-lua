@@ -16,7 +16,7 @@ while true do
 
     network[networkAddress]:run()
 
-    while not network[networkAddress].outputQueue:is_empty() do
+    while network[networkAddress]:hasOutput() do
       local destinationAddress = network[networkAddress]:read()
 
       local x = network[networkAddress]:read()

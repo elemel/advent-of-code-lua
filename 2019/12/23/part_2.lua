@@ -23,7 +23,7 @@ while true do
 
     network[networkAddress]:run()
 
-    if not network[networkAddress].outputQueue:is_empty() then
+    if network[networkAddress]:hasOutput() then
       idle = false
 
       repeat
@@ -39,7 +39,7 @@ while true do
           network[destinationAddress]:write(x)
           network[destinationAddress]:write(y)
         end
-      until network[networkAddress].outputQueue:is_empty()
+      until not network[networkAddress]:hasOutput()
     end
   end
 

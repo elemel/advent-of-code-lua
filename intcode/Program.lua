@@ -259,4 +259,8 @@ function Program:read()
   return self.outputQueue:pop_left()
 end
 
+function Program:hasOutput()
+  return not self.outputQueue:is_empty()
+end
+
 return Program

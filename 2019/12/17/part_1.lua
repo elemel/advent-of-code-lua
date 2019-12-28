@@ -16,7 +16,7 @@ program:run()
 
 local grid = {{}}
 
-while not program.outputQueue:is_empty() do
+while program:hasOutput() do
   local output = program:read()
 
   if output == 10 then
