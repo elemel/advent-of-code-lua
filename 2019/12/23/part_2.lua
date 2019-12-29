@@ -23,7 +23,7 @@ while true do
 
     network[networkAddress]:run()
 
-    if network[networkAddress]:hasOutput() then
+    if network[networkAddress]:canRead() then
       idle = false
 
       repeat
@@ -39,7 +39,7 @@ while true do
           network[destinationAddress]:write(x)
           network[destinationAddress]:write(y)
         end
-      until not network[networkAddress]:hasOutput()
+      until not network[networkAddress]:canRead()
     end
   end
 

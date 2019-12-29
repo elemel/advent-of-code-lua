@@ -26,7 +26,7 @@ local function printVideo(program)
   local result
   local grid = {{}}
 
-  while program:hasOutput() do
+  while program:canRead() do
     local output = program:read()
 
     if output >= 256 then

@@ -16,7 +16,7 @@ while true do
 
     network[networkAddress]:run()
 
-    while network[networkAddress]:hasOutput() do
+    while network[networkAddress]:canRead() do
       local destinationAddress = network[networkAddress]:read()
 
       local x = network[networkAddress]:read()

@@ -259,7 +259,7 @@ function Program:read()
   return self.outputQueue:pop_left()
 end
 
-function Program:hasOutput()
+function Program:canRead()
   return not self.outputQueue:is_empty()
 end
 

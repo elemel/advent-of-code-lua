@@ -16,7 +16,7 @@ program:run()
 
 local grid = {{}}
 
-while program:hasOutput() do
+while program:canRead() do
   local output = program:read()
 
   if output == 10 then

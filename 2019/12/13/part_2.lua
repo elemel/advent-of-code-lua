@@ -29,7 +29,7 @@ repeat
   local paddleX
   local ballX
 
-  while program:hasOutput() do
+  while program:canRead() do
     local x = program:read()
     local y = program:read()
     local id = program:read()
