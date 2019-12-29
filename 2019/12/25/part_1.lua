@@ -3,7 +3,6 @@ local yulea = require("yulea")
 
 local band = bit.band
 local lshift = bit.lshift
-local split = yulea.split
 
 local program = intcode.Program.new(io.read())
 
@@ -26,14 +25,6 @@ local function readLine(program)
   return nil
 end
 
-local function writeLine(program, line)
-  for char in split(line) do
-    program.inputQueue:push_right(string.byte(char))
-  end
-
-  program.inputQueue:push_right(10)
-end
-
 local function printOutput(program)
   while true do
     local line = readLine(program)
@@ -47,7 +38,7 @@ local function printOutput(program)
 end
 
 local function runCommand(program, command)
-  writeLine(program, command)
+  program:writeLine(command)
   program:run()
   printOutput(program)
 end

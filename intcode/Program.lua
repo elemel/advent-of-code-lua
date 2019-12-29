@@ -263,4 +263,12 @@ function Program:canRead()
   return not self.outputQueue:is_empty()
 end
 
+function Program:writeLine(line)
+  for i = 1, #line do
+    self.inputQueue:push_right(string.byte(line, i))
+  end
+
+  self.inputQueue:push_right(string.byte("\n"))
+end
+
 return Program

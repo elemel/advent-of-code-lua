@@ -1,25 +1,15 @@
 local intcode = require("intcode")
 local yulea = require("yulea")
 
-local split = yulea.split
-
-local function writeLine(program, line)
-  for char in split(line) do
-    program:write(string.byte(char))
-  end
-
-  program:write(10)
-end
-
 local program = intcode.Program.new(io.read())
 
-writeLine(program, "NOT J J")
-writeLine(program, "AND A J")
-writeLine(program, "AND B J")
-writeLine(program, "AND C J")
-writeLine(program, "NOT J J")
-writeLine(program, "AND D J")
-writeLine(program, "WALK")
+program:writeLine("NOT J J")
+program:writeLine("AND A J")
+program:writeLine("AND B J")
+program:writeLine("AND C J")
+program:writeLine("NOT J J")
+program:writeLine("AND D J")
+program:writeLine("WALK")
 
 program:run()
 local row = {}

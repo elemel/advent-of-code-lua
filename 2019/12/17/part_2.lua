@@ -2,7 +2,6 @@ local intcode = require("intcode")
 local yulea = require("yulea")
 
 local printGrid = yulea.printGrid
-local split = yulea.split
 
 local function getLoopedCell(grid, x, y)
   local width = #grid[1]
@@ -12,14 +11,6 @@ local function getLoopedCell(grid, x, y)
   y = (y - 1) % height + 1
 
   return grid[y][x]
-end
-
-local function writeLine(program, line)
-  for char in split(line) do
-    program:write(string.byte(char))
-  end
-
-  program:write(10)
 end
 
 local function printVideo(program)
@@ -47,12 +38,12 @@ end
 
 local program = intcode.Program.new(io.read())
 program.memory[0] = 2
-writeLine(program, "A,A,B,C,B,C,B,C,C,A")
-writeLine(program, "L,10,R,8,R,8")
-writeLine(program, "L,10,L,12,R,8,R,10")
-writeLine(program, "R,10,L,12,R,10")
--- writeLine(program, "y")
-writeLine(program, "n")
+
+program:writeLine("A,A,B,C,B,C,B,C,C,A")
+program:writeLine("L,10,R,8,R,8")
+program:writeLine("L,10,L,12,R,8,R,10")
+program:writeLine("R,10,L,12,R,10")
+program:writeLine("n")
 
 local result
 
