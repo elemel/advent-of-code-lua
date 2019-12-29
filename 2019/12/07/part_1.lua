@@ -12,11 +12,11 @@ local function signal(source, phases)
   for phase in elements(phases) do
     local amplifier = intcode.Program.new(source)
 
-    amplifier.inputQueue:push_right(phase)
-    amplifier.inputQueue:push_right(result)
+    amplifier:write(phase)
+    amplifier:write(result)
 
     amplifier:run()
-    result = amplifier.outputQueue:pop_left()
+    result = amplifier:read()
   end
 
   return result
